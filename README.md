@@ -1,7 +1,9 @@
 # ProjectGenerator
 
 # Estrutura do Gerador
+
 {
+
     "name-project": "AutoloadGenerator",
     "description": "Projeto de teste para autoload",
     "folders": [
