@@ -1,95 +1,91 @@
 <?php
 
 
-// $filename = 'autoload.json';
+$filename = 'autoload.json';
 
-// if (file_exists($filename)) {
-//     echo "O arquivo $filename existe";
-//     $fp = fopen('autoload.json', 'w');
-//     fwrite($fp, json_encode($response));
-//     fclose($fp);
+if (file_exists($filename)) {
+    $json = json_decode(file_get_contents('autoload.json'));
 
+    // CRIAÇÃO DO AUTOLOAD
+    $folders = '[';
+    foreach ($json->folders as $folder)
+        $folders .= '"' . $folder . '", ';
+    $folders = substr($folders, 0, strlen($folders) - 2) . ']';
+    
+    $autoload =
+'<?php
+spl_autoload_register(function ($nomeClasse) {
+    $folders = ' . $folders . ';
+    foreach ($folders as $folder) {
+        if (file_exists($folder.DIRECTORY_SEPARATOR.$nomeClasse.".php")) {
+            require_once($folder.DIRECTORY_SEPARATOR.$nomeClasse.".php");
+        }
+    }
+});';
+    $fp = fopen('autoload.php', 'w');
+    fwrite($fp, $autoload);
+    fclose($fp);
 
+    // CRIACAO DAS PASTAS
+    $arrayFolders = [];
+    foreach ($json->folders as $folder)
+        if (!file_exists($folder))
+            mkdir(__DIR__ . '/' . $folder, 0777, true);
+    
+    // CRIACAO DA CONEXAO
+    $conexao = 
+'<?php
 
-// } else {
-//     echo "O arquivo $filename não existe";
-// }
+class Conexao {
 
+    private const DB_TYPE = ' . $json->pdo->driver . ';
+    private const DB_HOST = ' . $json->pdo->host . ';
+    private const DB_NAME = ' . $json->pdo->name . ';
+    private const DB_USER = ' . $json->pdo->user . ';
+    private const DB_PASSWORD = ' . ($json->pdo->password != "" ? $json->pdo->password : '""') . ';
 
-// $json = json_decode(file_get_contents('autoload.json'));
+    // instance
+    private static $conexao;
 
-// foreach ($json->folders as $folder) {
-//     $path = explode('/', $folder);
-//     $require = "";
-//     foreach($path as $key => $class) {
-//         $require .= $class . DIRECTORY_SEPARATOR;
-//     }
-//     $require .= $nomeClasse . ".php";
+    // getInstance
+    public static function startConnection()
+    {
+        if (isset(self::$conexao))
+            return self::$conexao;
+        
+        try {
+            self::$conexao = new PDO(self::DB_TYPE . ":host=" . self::DB_HOST . ";dbname=" . self::DB_NAME, self::DB_USER, self::DB_PASSWORD);
+            self::$conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return self::$conexao;
+            
+        } catch(PDOException $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
+}';
 
-//     echo ' | ' . $require;
-//     if (file_exists($require)) {
-//         require_once($require);
-//     }
-// }
+    if (!file_exists(__DIR__ . '/conexao'))
+        mkdir(__DIR__ . '/conexao', 0777, true);
+    $fp = fopen('conexao/Conexao.php', 'w');
+    fwrite($fp, $conexao);
+    fclose($fp);
 
+    // CRIACAO DO TESTE DE CONEXAO
+    $index = 
+'<?php
 
-$json = json_decode(file_get_contents('autoload.json'));
-$folders = '[';
-foreach ($json->folders as $folder)
-    $folders .= '"' . $folder . '", ';
-$folders = substr($folders, 0, strlen($folders) - 2) . ']';
-echo $folders;
+require_once "autoload.php";
 
+echo Conexao::startConnection();
 
-$autoload = ''
-    . 'spl_autoload_register(function ($nomeClasse) {'
-    . '    $folders = array("classes", "conf", "dao");'
-    . '    foreach ($folders as $folder) {'
-    . '        if (file_exists($folder.DIRECTORY_SEPARATOR.$nomeClasse.".class.php")) {'
-    . '            require_once($folder.DIRECTORY_SEPARATOR.$nomeClasse.".class.php");'
-    . '        }'
-    . '    }'
-    . '});';
-
-
-
-
-
-
-
-
-
-
-
-// var_dump($json);
-
-// $arrayFolders = [];
-// foreach ($json->folders as $folder) {
-//     $arrayFolders[] = $folder;
-//     $path = explode('/', $folder);
-//     $require = "";
-//     foreach($path as $key => $class) {
-//         $require .= $class . DIRECTORY_SEPARATOR;
-//     }
-//     $require .= $nomeClasse . ".php";
-
-//     echo ' | ' . $require;
-//     if (file_exists($require)) {
-//         require_once($require);
-//     }
-// }
-
-
-
-// spl_autoload_register(function ($nomeClasse)
-// {
-//     $folders = array("classes", "conf", "dao");
-//     foreach ($folders as $folder) {
-//         if (file_exists($folder.DIRECTORY_SEPARATOR.$nomeClasse.".class.php")) {
-//             require_once($folder.DIRECTORY_SEPARATOR.$nomeClasse.".class.php");
-//         }
-//     }
-// });
+';
+    $fp = fopen('testeConexao.php', 'w');
+    fwrite($fp, $index);
+    fclose($fp);
+    
+} else {
+    echo "O arquivo $filename não existe";
+}
 
 
 
