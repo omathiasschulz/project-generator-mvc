@@ -7,7 +7,7 @@ if (file_exists($filename)) {
     $json = json_decode(file_get_contents('autoload.json'));
 
     // CRIAÇÃO DO AUTOLOAD
-    $folders = '[';
+    $folders = '[ "conexao", ';
     foreach ($json->folders as $folder)
         $folders .= '"' . $folder . '", ';
     $folders = substr($folders, 0, strlen($folders) - 2) . ']';
@@ -38,11 +38,11 @@ spl_autoload_register(function ($nomeClasse) {
 
 class Conexao {
 
-    private const DB_TYPE = ' . $json->pdo->driver . ';
-    private const DB_HOST = ' . $json->pdo->host . ';
-    private const DB_NAME = ' . $json->pdo->name . ';
-    private const DB_USER = ' . $json->pdo->user . ';
-    private const DB_PASSWORD = ' . ($json->pdo->password != "" ? $json->pdo->password : '""') . ';
+    private const DB_TYPE = "' . $json->pdo->driver . '";
+    private const DB_HOST = "' . $json->pdo->host . '";
+    private const DB_NAME = "' . $json->pdo->name . '";
+    private const DB_USER = "' . $json->pdo->user . '";
+    private const DB_PASSWORD = ' . ($json->pdo->password != "" ? '"'.$json->pdo->password.'"' : '""') . ';
 
     // instance
     private static $conexao;
@@ -76,7 +76,10 @@ class Conexao {
 
 require_once "autoload.php";
 
-echo Conexao::startConnection();
+if (Conexao::startConnection())
+    echo "Conexão efetuada com sucesso!";
+else
+    echo "Erro ao conectar ao banco!";
 
 ';
     $fp = fopen('testeConexao.php', 'w');
@@ -86,7 +89,3 @@ echo Conexao::startConnection();
 } else {
     echo "O arquivo $filename não existe";
 }
-
-
-
-// Criar: autoload.php, Conexao.php, pastas

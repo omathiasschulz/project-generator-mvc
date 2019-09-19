@@ -4,19 +4,18 @@
 
 {
 
-    "name-project": "AutoloadGenerator",
-    "description": "Projeto de teste para autoload",
+    "name-project": "nome_do_projeto",
+    "description": "descricao",
     "folders": [
-        "controller",
-        "view",
-        "model",
-        "helpers"
+        "folder1",
+        "folder2",
+        "folder3"
     ],
     "pdo": {
-        "driver": "mysql",
-        "host": "localhost",
-        "name": "launches",
-        "user": "root",
-        "password": ""
+        "driver": "nome_banco",
+        "host": "nome_do_host",
+        "name": "nome_do_db",
+        "user": "nome_do_usuario",
+        "password": "senha"
     }
 }

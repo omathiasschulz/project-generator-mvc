@@ -2,12 +2,14 @@
     "name-project": "AutoloadGenerator",
     "description": "Projeto de teste para autoload",
     "folders": [
-        "conexao",
+        "controller",
+        "view",
+        "model",
         "helpers"
     ],
     "pdo": {
         "driver": "mysql",
-        "host": "localhost",
+        "host": "127.0.0.1",
         "name": "launches",
         "user": "root",
         "password": ""
