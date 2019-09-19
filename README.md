@@ -19,3 +19,13 @@
         "password": "senha"
     }
 }
+
+# Executar o Gerador
+
+1. Atualize o arquivo .json com as suas respectivas necessidades
+
+2. Na pasta raiz do projeto execute o Generator.php no terminal:
+php Generator.php
+
+3. Para testar a conexão com o banco de dados, execute o testeGenerator.php no terminal:
+php testeGenerator.php
