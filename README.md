@@ -27,5 +27,5 @@
 2. Na pasta raiz do projeto execute o Generator.php no terminal:
 php Generator.php
 
-3. Para testar a conexão com o banco de dados, execute o testeGenerator.php no terminal:
-php testeGenerator.php
+3. Para testar a conexão com o banco de dados, execute o testeConexao.php no terminal:
+php testeConexao.php
