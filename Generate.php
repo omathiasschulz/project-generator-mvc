@@ -1,6 +1,7 @@
 <?php
 
 require_once('generator/GenerateAutoload.php');
+require_once('generator/GenerateFolders.php');
 
 class Generate
 {
@@ -15,9 +16,8 @@ class Generate
             return [false, 'Arquivo ' . self::FILENAME . ' não existe!'];
         $json = self::getFile();
 
-        // GenerateAutoload::create($json->folders, ['conexao']);
-
-        // return $json;
+        GenerateAutoload::create($json->folders, ['conexao']);
+        GenerateFolders::create($json->folders);
     }
 
     /**
@@ -29,12 +29,6 @@ class Generate
     }
 }
 
-
-//     // CRIACAO DAS PASTAS
-//     $arrayFolders = [];
-//     foreach ($json->folders as $folder)
-//         if (!file_exists($folder))
-//             mkdir(__DIR__ . '/' . $folder, 0777, true);
     
 //     // CRIACAO DA CONEXAO
 //     $conexao = 

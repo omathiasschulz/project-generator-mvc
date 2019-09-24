@@ -11,4 +11,14 @@ class Helpers
         fwrite($fp, $content);
         fclose($fp);
     }
+
+    /**
+     * Método que cria um folder caso ainda não exista
+     */
+    public static function createFolder($pathFolder)
+    {
+        $completePathFolder = __DIR__ . DIRECTORY_SEPARATOR . $pathFolder;
+        if (!file_exists($completePathFolder))
+            mkdir($completePathFolder, 0777, true);
+    }
 }
