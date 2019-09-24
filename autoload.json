@@ -2,9 +2,11 @@
     "name-project": "AutoloadGenerator",
     "description": "Projeto de teste para autoload",
     "folders": [
-        "controller",
-        "view",
-        "model",
+        "app/controller/bo",
+        "app/controller/dto",
+        "app/controller/dao",
+        "app/view",
+        "app/model",
         "helpers"
     ],
     "pdo": {
