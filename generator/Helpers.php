@@ -7,7 +7,8 @@ class Helpers
      */
     public static function writeFile($filename, $content)
     {
-        $fp = fopen($filename, 'w');
+        $completeFilename = __DIR__ . DIRECTORY_SEPARATOR . $filename;
+        $fp = fopen($completeFilename, 'w');
         fwrite($fp, $content);
         fclose($fp);
     }
