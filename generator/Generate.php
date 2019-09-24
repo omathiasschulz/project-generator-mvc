@@ -1,8 +1,9 @@
 <?php
 
-require_once('generator/GenerateAutoload.php');
-require_once('generator/GenerateFolders.php');
-require_once('generator/GenerateConexao.php');
+require_once('GenerateAutoload.php');
+require_once('GenerateFolders.php');
+require_once('GenerateConexao.php');
+require_once('GenerateIndex.php');
 
 class Generate
 {
@@ -20,6 +21,9 @@ class Generate
         GenerateAutoload::create($json->folders, ['conexao']);
         GenerateFolders::create($json->folders);
         GenerateConexao::create($json->pdo);
+        GenerateIndex::create('autoload.php');
+
+        return [true, 'Projeto gerado com sucesso.'];
     }
 
     /**
@@ -30,23 +34,3 @@ class Generate
         return json_decode(file_get_contents(self::FILENAME));
     }
 }
-
-//     // CRIACAO DO TESTE DE CONEXAO
-//     $index = 
-// '<?php
-
-// require_once "autoload.php";
-
-// if (Conexao::startConnection())
-//     echo "Conexão efetuada com sucesso!";
-// else
-//     echo "Erro ao conectar ao banco!";
-
-// ';
-//     $fp = fopen('index.php', 'w');
-//     fwrite($fp, $index);
-//     fclose($fp);
-    
-// } else {
-//     echo "O arquivo $filename não existe";
-// }

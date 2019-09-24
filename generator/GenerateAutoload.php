@@ -4,7 +4,7 @@ require_once('Helpers.php');
 
 class GenerateAutoload
 {
-    const AUTOLOAD_NAME = 'autoload.php';
+    const AUTOLOAD_NAME = '../autoload.php';
 
     /**
      * Método responsável por gerar o autoload

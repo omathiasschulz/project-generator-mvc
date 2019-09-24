@@ -1,7 +1,7 @@
 <?php
 
-require_once('Generate.php');
+require_once('generator/Generate.php');
 
 $result = Generate::start();
 
-// var_dump($result);
+echo $result[1];
