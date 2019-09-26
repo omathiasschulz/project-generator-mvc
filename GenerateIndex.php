@@ -10,7 +10,7 @@ class GenerateIndex
     public static function create($autoloadFilename)
     {
         $index = self::getIndex($autoloadFilename);
-        Helpers::writeFile('../index.php', $index);
+        Helpers::writeFile('index.php', $index);
     }
 
     /**

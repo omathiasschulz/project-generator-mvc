@@ -14,7 +14,7 @@ class Generate
      */
     public static function start()
     {
-        if (!file_exists(self::FILENAME))
+        if (!file_exists(__DIR__ . '/' . self::FILENAME))
             return [false, 'Arquivo ' . self::FILENAME . ' não existe!'];
         $json = self::getFile();
 
@@ -31,6 +31,6 @@ class Generate
      */
     private function getFile()
     {
-        return json_decode(file_get_contents(self::FILENAME));
+        return json_decode(file_get_contents('autoload.json', 'r'));
     }
 }

@@ -10,8 +10,8 @@ class GenerateConexao
     public static function create($pdo)
     {
         $conexao = self::getConexao($pdo);
-        Helpers::createFolder('../app/conexao');
-        Helpers::writeFile('../app/conexao/Conexao.php', $conexao);
+        Helpers::createFolder('app/conexao');
+        Helpers::writeFile('app/conexao/Conexao.php', $conexao);
     }
 
     /**

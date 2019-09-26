@@ -10,7 +10,7 @@ class GenerateFolders
     public static function create($aFolders)
     {
         foreach ($aFolders as $folder) {
-            Helpers::createFolder('../' . $folder);
+            Helpers::createFolder($folder);
         }
     }
 }

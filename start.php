@@ -1,6 +1,6 @@
 <?php
 
-require_once('generator/Generate.php');
+require_once('Generate.php');
 
 $result = Generate::start();
 
