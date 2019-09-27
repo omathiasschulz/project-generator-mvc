@@ -9,6 +9,9 @@ class GenerateRoutes
      */
     public static function create($aRoutes)
     {
+        $stringIndex = self::getIndex();
+        Helpers::writeFile('index.php', $stringIndex);
+
         $stringRoutes = self::getRoutesPhp($aRoutes);
         Helpers::createFolder('app');
         Helpers::writeFile('app/routes.php', $stringRoutes);
@@ -28,58 +31,17 @@ class GenerateRoutes
     }
 
     /**
-     * Monta a string a partir dos folders do array
+     * Método que gera a string que será gravada no index.php
      */
-    private function getStringFolders($aFolders)
-    {
-        $result = '';
-        foreach ($aFolders as $folder) {
-            // Um folder pode possuir vários pacotes
-            $aPaths = explode('/', $folder);
-            $sFolder = '';
-            foreach ($aPaths as $path) {
-                $sFolder .= $path . DIRECTORY_SEPARATOR; // São remontados de acordo com o SO
-            }
-            $sFolder = substr($sFolder, 0, strlen($sFolder) - 1);
-            $result .= '"' . $sFolder . '", ';
-        }
-        return $result;
-    }
-
-    /**
-     * Monta a string de folders em formato de array
-     */
-    private function getFolders($aFolders, $aStandartFolders)
-    {
-        $result = '[';
-        if ($aStandartFolders)
-            $result .= self::getStringFolders($aStandartFolders);
-        
-        if ($aFolders)
-            $result .= self::getStringFolders($aFolders);
-        
-        if (strlen($result) > 1)
-            $result = substr($result, 0, strlen($result) - 2);
-        $result .= ']';
-        return $result;
-    }
-
-    /**
-     * Método que gera a string que será gravada no autoload.php
-     */
-    private function getAutoload($folders)
+    private function getIndex()
     {
         return 
 '<?php
 
-spl_autoload_register(function ($nomeClasse) {
-    $folders = ' . $folders . ';
-    foreach ($folders as $folder) {
-        if (file_exists($folder.DIRECTORY_SEPARATOR.$nomeClasse.".php")) {
-            require_once($folder.DIRECTORY_SEPARATOR.$nomeClasse.".php");
-        }
-    }
-});';
+require_once("autoload.php");
+$routes = require_once("app/routes.php");
+$route = new Route($routes);
+';
     }
 
     /**
@@ -233,9 +195,8 @@ class ControllerUtil
     /**
      * Método para instanciar o controller
      */
-    public static function newController($controller)
+    public static function newController($oController)
     {
-        $oController = "app\\\\controller\\\\" . $controller;
         return new $oController;
     }
 

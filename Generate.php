@@ -19,7 +19,7 @@ class Generate
             return [false, 'Arquivo ' . self::FILENAME . ' não existe!'];
         $json = self::getFile();
 
-        GenerateAutoload::create($json->folders, ['conexao']);
+        GenerateAutoload::create($json->folders, ['conexao', 'core']);
         GenerateFolders::create($json->folders);
         GenerateConexao::create($json->pdo);
         GenerateIndex::create('autoload.php');
