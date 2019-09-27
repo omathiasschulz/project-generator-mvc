@@ -239,7 +239,7 @@ RewriteRule ^(.*)$ index.php?url=$1 [NC,L,QSA]';
                 $stringFile = substr($stringFile, 0, -1);
                 $stringFile .= 
 '    public function ' . $route->method . '() {
-        echo "funcao ' . $route->method . '";
+        echo "Página ' . $route->method . '";
     }
 
 }';
