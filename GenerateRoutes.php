@@ -26,8 +26,8 @@ class GenerateRoutes
         $stringHtAccess = self::getHtAccess();
         Helpers::writeFile('.htaccess', $stringHtAccess);
 
-        // Helpers::createFolder('controller');
-        // self::getControllerFiles($aRoutes);
+        Helpers::createFolder('app/controller');
+        self::getControllerFiles($aRoutes);
     }
 
     /**
@@ -227,14 +227,35 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php?url=$1 [NC,L,QSA]';
     }
 
-    // /**
-    //  * Método que gera a string que será gravada no .htaccess
-    //  */
-    // private function getControllerFiles($routes)
-    // {
-    //     foreach ($routes as $route) {
+    /**
+     * Método que gera os controllers
+     */
+    private function getControllerFiles($routes)
+    {
+        foreach ($routes as $route) {
+            $atualNameFile = 'app/controller/' . $route->controller . '.php';
+            if (file_exists($atualNameFile)) {
+                $stringFile = file_get_contents($atualNameFile, 'r');
+                $stringFile = substr($stringFile, 0, -1);
+                $stringFile .= 
+'    public function ' . $route->method . '() {
+        echo "funcao ' . $route->method . '";
+    }
 
-    //     }
-    //     Helpers::writeFile('core/Route.php', $stringCoreRoute);
-    // }
+}';
+            } else {
+                $stringFile = 
+'<?php
+
+class ' . $route->controller . ' {
+
+    public function ' . $route->method . '() {
+        echo "Página ' . $route->method . '";
+    }
+    
+}';
+            }
+            Helpers::writeFile('app/controller/' . $route->controller . '.php', $stringFile);
+        }
+    }
 }
