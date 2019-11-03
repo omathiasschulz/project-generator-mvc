@@ -4,16 +4,15 @@ require_once('Helpers.php');
 
 class GenerateAutoload
 {
-    const AUTOLOAD_NAME = 'autoload.php';
 
     /**
      * Método responsável por gerar o autoload
      */
-    public static function create($aFolders, $aStandartFolders)
+    public static function create($sAutoloadName, $aFolders, $aStandartFolders)
     {
         $folders = self::getFolders($aFolders, $aStandartFolders);
         $autoload = self::getAutoload($folders);
-        Helpers::writeFile(self::AUTOLOAD_NAME, $autoload);
+        Helpers::writeFile($sAutoloadName, $autoload);
     }
 
     /**

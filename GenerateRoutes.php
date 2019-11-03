@@ -7,9 +7,9 @@ class GenerateRoutes
     /**
      * Método responsável por gerar as rotas
      */
-    public static function create($aRoutes)
+    public static function create($sAutoloadName, $aRoutes)
     {
-        $stringIndex = self::getIndex();
+        $stringIndex = self::getIndex($sAutoloadName);
         Helpers::writeFile('index.php', $stringIndex);
 
         $stringRoutes = self::getRoutesPhp($aRoutes);
@@ -33,12 +33,12 @@ class GenerateRoutes
     /**
      * Método que gera a string que será gravada no index.php
      */
-    private function getIndex()
+    private function getIndex($sAutoloadName)
     {
         return 
 '<?php
 
-require_once("autoload.php");
+require_once("' . $sAutoloadName . '");
 $routes = require_once("app/routes.php");
 $route = new Route($routes);
 ';

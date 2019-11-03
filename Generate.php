@@ -8,22 +8,23 @@ require_once('GenerateRoutes.php');
 
 class Generate
 {
-    const FILENAME = 'autoload.json';
+    const JSON = 'generator.json';
+    const AUTOLOAD_NAME = 'autoload.php';
 
     /**
      * Método principal
      */
     public static function start()
     {
-        if (!file_exists(__DIR__ . '/' . self::FILENAME))
-            return [false, 'Arquivo ' . self::FILENAME . ' não existe!'];
+        if (!file_exists(__DIR__ . '/' . self::JSON))
+            return [false, 'Arquivo ' . self::JSON . ' não existe!'];
         $json = self::getFile();
 
-        GenerateAutoload::create($json->folders, ['conexao', 'core']);
+        GenerateAutoload::create(self::AUTOLOAD_NAME, $json->folders, ['conexao', 'core']);
         GenerateFolders::create($json->folders);
         GenerateConexao::create($json->pdo);
-        GenerateIndex::create('autoload.php');
-        GenerateRoutes::create($json->routes);
+        GenerateIndex::create(self::AUTOLOAD_NAME);
+        GenerateRoutes::create(self::AUTOLOAD_NAME, $json->routes);
 
         return [true, 'Projeto gerado com sucesso.'];
     }
@@ -33,6 +34,6 @@ class Generate
      */
     private function getFile()
     {
-        return json_decode(file_get_contents('autoload.json', 'r'));
+        return json_decode(file_get_contents(self::JSON, 'r'));
     }
 }
