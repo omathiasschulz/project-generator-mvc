@@ -53,7 +53,9 @@ class SQLExtractor
     {
         $sPattern = "/(?i)^[[:space:]]*create[[:space:]]+database[[:space:]]+([a-zA-Z0-9]\w+)[[:space:]]*;/";
         preg_match_all($sPattern, $sSql, $aMatches);
-        return isset($aMatches[1][0]) ? [true, $aMatches[1][0]] : [false, 'Erro ao buscar o nome do Database'];
+        return isset($aMatches[1][0]) 
+            ? [true, $aMatches[1][0]] 
+            : [false, 'Erro ao buscar o nome do Database'];
     }
 
     /**
@@ -97,14 +99,12 @@ class SQLExtractor
     private function getTableAttributes($sAttributes, $sTypes)
     {
         // Remove os parênteses iniciais e finais
-        // $sAttributes = trim($sAttributes);
         $sAttributes = substr(trim($sAttributes), 1, strlen($sAttributes) - 2);
 
         // Verifica as chaves primárias e já retira dos parâmetros também
         $aPrimaryKeys = self::getTablePrimaryKey($sAttributes);
         if (!$aPrimaryKeys[0])
             return $aPrimaryKeys;
-        
         $aFormattedAttributes[] = ['chaves_primarias' => $aPrimaryKeys[1]];
         $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)$/";
         $sAttributes = preg_split($sPattern, $sAttributes)[0];
@@ -112,12 +112,8 @@ class SQLExtractor
         // Realiza um split na vírgula 
         // Entretanto não pode dar split na virgula de atributos como decimal(3,3)
         $aAttributes = preg_split("/(?<=[^0-9])\,/", $sAttributes);
-        // var_dump($aAttributes); echo '<br>';
-
-        // echo '<pre>' , var_dump($variable) , '</pre>';
-
-        // $aFormattedAttributes = [];
-        foreach ($aAttributes as $key => $sAttribute) {
+        
+        foreach ($aAttributes as $sAttribute) {
             $aActualAttribute = self::getTableOneAttribute($sAttribute, $sTypes);
             if (!$aActualAttribute[0])
                 return $aActualAttribute;
@@ -146,26 +142,14 @@ class SQLExtractor
         return [true, $aChaves];
     }
 
+    /**
+     * Método responsável por pegar e validar um atributo da tabela
+     */
     private function getTableOneAttribute($sAttribute, $sTypes)
     {
         $sAttribute = trim($sAttribute);
         $sPattern = "/(?i)^([a-zA-Z0-9_-]+)[[:space:]]+" . $sTypes . "$/";
         preg_match_all($sPattern, $sAttribute, $aMatches);
-
-        // echo '<br><br>';
-        // var_dump($sPattern);
-        // echo '<br><br>';
-
-        // echo '<br><br>';
-        // var_dump($aMatches);
-        // echo '<br>';
-
-        // $sNomeVariavel = $aMatches[1][0];
-        // echo '<br>$sNomeVariavel: ' . $sNomeVariavel;
-        // $sTipoVariavel = $aMatches[2][0];
-        // echo '<br>$sTipoVariavel: ' . $sTipoVariavel;
-        // $sNotNull = $aMatches[9][0];
-        // echo '<br>$sNotNull: ' . $sNotNull;
 
         if (!isset($aMatches[1][0]) || !isset($aMatches[2][0]))
             return [false, 'Erro ao buscar os atributos de uma tabela'];
@@ -173,8 +157,8 @@ class SQLExtractor
         return [
             true,
             [
-                'nome'  => $aMatches[1][0],
-                'tipo'  => $aMatches[2][0],
+                'nome'     => $aMatches[1][0],
+                'tipo'     => $aMatches[2][0],
                 'not null' => !empty($aMatches[9][0]) ? true : false
             ]
         ];
@@ -207,7 +191,7 @@ class SQLExtractor
             // variavel (parametro01)
             . '|((' . $sTypesConfigOne . ')[[:space:]]*\([[:space:]]*[0-9]+[[:space:]]*\))'
             // variavel (parametro01, parametro02)
-            . '|((' . $sTypesConfigOne . ')[[:space:]]*\([[:space:]]*[0-9]+[[:space:]]*\,[[:space:]]*[0-9]+[[:space:]]*\))'
+            . '|((' . $sTypesConfigTwo . ')[[:space:]]*\([[:space:]]*[0-9]+[[:space:]]*\,[[:space:]]*[0-9]+[[:space:]]*\))'
             . ')';
     }
 

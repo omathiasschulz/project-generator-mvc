@@ -7,6 +7,9 @@ create table professor (
     nome varchar(100) not null,
     rg varchar(11),
     cpf varchar(11),
+    variavel decimal,
+    variavel2 decimal(3),
+    variavel3 decimal(3,3),
     dataNasc date,
     primary key(id, codigo, nome)
 );
