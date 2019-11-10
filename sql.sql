@@ -8,7 +8,7 @@ create table professor (
     rg varchar(11),
     cpf varchar(11),
     dataNasc date,
-    primary key(id, codigo)
+    primary key(id, codigo, nome)
 );
 
 create table aluno (

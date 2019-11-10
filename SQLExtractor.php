@@ -75,9 +75,13 @@ class SQLExtractor
             if (empty($sTableName))
                 return [false, 'Erro ao buscar o nome de uma das tabelas'];
             
+            $aActualAttributes = self::getTableAttributes($sTableAttributes, $sTypes);
+            if (!$aActualAttributes[0])
+                return $aActualAttributes;
+
             $aFormattedTables[] = [
-                'nome' => $sTableName,
-                'atributos' => self::getTableAttributes($sTableAttributes, $sTypes)
+                'nome'      => $sTableName,
+                'atributos' => $aActualAttributes[1]
             ];
 
             // Remove a tabela atual do SQL
@@ -96,13 +100,14 @@ class SQLExtractor
         // $sAttributes = trim($sAttributes);
         $sAttributes = substr(trim($sAttributes), 1, strlen($sAttributes) - 2);
 
-        // Verifica se possui chave primária, se tiver já retira dos parâmetros tambem
+        // Verifica as chaves primárias e já retira dos parâmetros também
         $aPrimaryKeys = self::getTablePrimaryKey($sAttributes);
-        if ($aPrimaryKeys) {
-            $aFormattedAttributes[] = ['chaves_primarias' => $aPrimaryKeys];
-            $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)$/";
-            $sAttributes = preg_split($sPattern, $sAttributes)[0];
-        }
+        if (!$aPrimaryKeys[0])
+            return $aPrimaryKeys;
+        
+        $aFormattedAttributes[] = ['chaves_primarias' => $aPrimaryKeys[1]];
+        $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)$/";
+        $sAttributes = preg_split($sPattern, $sAttributes)[0];
 
         // Realiza um split na vírgula 
         // Entretanto não pode dar split na virgula de atributos como decimal(3,3)
@@ -113,29 +118,32 @@ class SQLExtractor
 
         // $aFormattedAttributes = [];
         foreach ($aAttributes as $key => $sAttribute) {
-            $aFormattedAttributes[] = self::getTableOneAttribute($sAttribute, $sTypes);
+            $aActualAttribute = self::getTableOneAttribute($sAttribute, $sTypes);
+            if (!$aActualAttribute[0])
+                return $aActualAttribute;
+            $aFormattedAttributes[] = $aActualAttribute[1];
         }
-        return $aFormattedAttributes;
+        return [true, $aFormattedAttributes];
     }
     
     /**
-     * Método responsável por verificar se possui chave primária
-     * Caso possuir, pega as chaves primárias, se não pega o atributo
+     * Método responsável por pegar as chaves primárias da tabela
      */
     private function getTablePrimaryKey($sAttribute)
     {
-        // echo '<br>AAAAAAAAAAAAAAAAAAAAa<br>';
         $sAttribute = trim($sAttribute);
-        // if (strpos($a, 'are') !== false) {
-        //     echo 'true';
-        // }
-        // primary key(chave_primaria, chave_primaria2)
-
-        // $sAttribute = trim($sAttribute);
         $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)$/";
         preg_match_all($sPattern, $sAttribute, $aMatches);
 
-        return !is_null($aMatches[1][0]) ? explode(',', $aMatches[1][0]) : false;
+        if (!isset($aMatches[1][0])) {
+            return [false, 'Erro ao buscar as chaves primárias de uma das tabelas'];
+        }
+        $aChaves = explode(',', $aMatches[1][0]);
+        // Remove espaços em branco antes e depois de cada chave primária
+        foreach ($aChaves as $key => $sChave)
+            $aChaves[$key] = trim($sChave);
+
+        return [true, $aChaves];
     }
 
     private function getTableOneAttribute($sAttribute, $sTypes)
@@ -158,10 +166,17 @@ class SQLExtractor
         // echo '<br>$sTipoVariavel: ' . $sTipoVariavel;
         // $sNotNull = $aMatches[9][0];
         // echo '<br>$sNotNull: ' . $sNotNull;
+
+        if (!isset($aMatches[1][0]) || !isset($aMatches[2][0]))
+            return [false, 'Erro ao buscar os atributos de uma tabela'];
+
         return [
-            'nome'  => $aMatches[1][0],
-            'tipo'  => $aMatches[2][0],
-            'not null' => !empty($aMatches[9][0]) ? true : false
+            true,
+            [
+                'nome'  => $aMatches[1][0],
+                'tipo'  => $aMatches[2][0],
+                'not null' => !empty($aMatches[9][0]) ? true : false
+            ]
         ];
     }
 
