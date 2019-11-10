@@ -8,17 +8,27 @@ class SQLExtractor
 
     /**
      * Método principal que retornará o nome do banco, as tabelas e os atributos de cada tabela
+     * Retorna um array, no qual a primeira posição determina se a operação foi realizada 
+     * com sucesso ou não, a segunda posição é a resposta
      */
     public static function getSQLData($sSqlName)
     {
         $sSql = self::getSQLFromFile($sSqlName);
 
+        $aDatabaseName = self::getDatabaseName($sSql);
+        if (!$aDatabaseName[0])
+            return $aDatabaseName;
+        $aTables = self::getTables($sSql);
+        if (!$aTables[0])
+            return $aTables;
+        
+        
         $aFormattedDatabase = [
-            'nome'    => self::getDatabaseName($sSql),
-            'tabelas' => self::getTables($sSql)
+            'nome'    => $aDatabaseName[1],
+            'tabelas' => $aTables[1]
         ];
 
-        return $aFormattedDatabase;
+        return [true, $aFormattedDatabase];
     }
     
     /**
@@ -39,7 +49,7 @@ class SQLExtractor
     {
         $sPattern = "/(?i)^[[:space:]]*create[[:space:]]+database[[:space:]]+([a-zA-Z0-9]\w+)[[:space:]]*;/";
         preg_match_all($sPattern, $sSql, $aMatches);
-        return $aMatches[1][0];
+        return isset($aMatches[1][0]) ? $aMatches[1][0] : [false, 'Erro ao buscar o nome do Database'];
     }
 
     /**
@@ -49,21 +59,22 @@ class SQLExtractor
     {
         $sPattern = "/(?i);[[:space:]]*create[[:space:]]+table[[:space:]]+([a-zA-Z0-9]\w+)[[:space:]]*(\([^;]+)/";
         preg_match_all($sPattern, $sSql, $aMatches);
-
         $aTablesName = $aMatches[1];
         $aTablesAttributes = $aMatches[2];
 
         $sTypes = self::generateTypeAttributes();
         $sTypes = self::generateTypeNotNull($sTypes);
 
-        // $aFormattedTables = [];
         foreach ($aTablesAttributes as $key => $sTableAttributes) {
+            echo 'TABELA: ' . $aTablesName[$key];
+            if (is_null($aTablesName[$key]))
+                return [false, 'Erro ao buscar o nome de uma das tabelas'];
             $aFormattedTables[] = [
                 'nome' => $aTablesName[$key],
                 'atributos' => self::getTableAttributes($sTableAttributes, $sTypes)
             ];
         }
-        return $aFormattedTables;
+        return [false, $aFormattedTables];
     }
 
     /**
