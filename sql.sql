@@ -12,7 +12,7 @@ create table professor (
 );
 
 create table aluno (
-    id int not null,
+     id  int not null,
     codigo int not null,
     nome varchar(100) not null,
     rg varchar(11),

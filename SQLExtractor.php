@@ -2,6 +2,9 @@
 
 class SQLExtractor
 {
+    // Regex que pega tudo até o primeiro ponto e vírgula
+    const PATTERN_TO_THE_SEMICOLON = "/(?i)\A([^;]+)\;/";
+
     const TYPES_NORMAL = ['decimal', 'tinyint', 'int', 'bigint', 'float', 'double', 'date', 'time', 'datetime', 'year'];
     const TYPES_WITH_CONFIG_ONE = ['varchar', 'decimal'];
     const TYPES_WITH_CONFIG_TWO = ['decimal'];
@@ -18,10 +21,11 @@ class SQLExtractor
         $aDatabaseName = self::getDatabaseName($sSql);
         if (!$aDatabaseName[0])
             return $aDatabaseName;
+        $sSql = self::splitToTheSemicolon($sSql);
+
         $aTables = self::getTables($sSql);
         if (!$aTables[0])
             return $aTables;
-        
         
         $aFormattedDatabase = [
             'nome'    => $aDatabaseName[1],
@@ -49,7 +53,7 @@ class SQLExtractor
     {
         $sPattern = "/(?i)^[[:space:]]*create[[:space:]]+database[[:space:]]+([a-zA-Z0-9]\w+)[[:space:]]*;/";
         preg_match_all($sPattern, $sSql, $aMatches);
-        return isset($aMatches[1][0]) ? $aMatches[1][0] : [false, 'Erro ao buscar o nome do Database'];
+        return isset($aMatches[1][0]) ? [true, $aMatches[1][0]] : [false, 'Erro ao buscar o nome do Database'];
     }
 
     /**
@@ -57,24 +61,30 @@ class SQLExtractor
      */
     private function getTables($sSql)
     {
-        $sPattern = "/(?i);[[:space:]]*create[[:space:]]+table[[:space:]]+([a-zA-Z0-9]\w+)[[:space:]]*(\([^;]+)/";
-        preg_match_all($sPattern, $sSql, $aMatches);
-        $aTablesName = $aMatches[1];
-        $aTablesAttributes = $aMatches[2];
-
         $sTypes = self::generateTypeAttributes();
         $sTypes = self::generateTypeNotNull($sTypes);
 
-        foreach ($aTablesAttributes as $key => $sTableAttributes) {
-            echo 'TABELA: ' . $aTablesName[$key];
-            if (is_null($aTablesName[$key]))
+        // Loop que passará por todas as tabelas do SQL
+        while(!empty($sSql)) {
+            // Pega o nome e os atributos da tabela atual
+            $sPattern = "/(?i)\A[[:space:]]*create[[:space:]]+table[[:space:]]+([a-zA-Z0-9]\w+)[[:space:]]*(\([^;]+)\;/";
+            preg_match_all($sPattern, $sSql, $aMatches);
+            $sTableName = isset($aMatches[1][0]) ? $aMatches[1][0] : null;
+            $sTableAttributes = isset($aMatches[2][0]) ? $aMatches[2][0] : null;
+            
+            if (empty($sTableName))
                 return [false, 'Erro ao buscar o nome de uma das tabelas'];
+            
             $aFormattedTables[] = [
-                'nome' => $aTablesName[$key],
+                'nome' => $sTableName,
                 'atributos' => self::getTableAttributes($sTableAttributes, $sTypes)
             ];
+
+            // Remove a tabela atual do SQL
+            $sSql = self::splitToTheSemicolon($sSql);
         }
-        return [false, $aFormattedTables];
+
+        return [true, $aFormattedTables];
     }
 
     /**
@@ -86,6 +96,7 @@ class SQLExtractor
         // $sAttributes = trim($sAttributes);
         $sAttributes = substr(trim($sAttributes), 1, strlen($sAttributes) - 2);
 
+        // Verifica se possui chave primária, se tiver já retira dos parâmetros tambem
         $aPrimaryKeys = self::getTablePrimaryKey($sAttributes);
         if ($aPrimaryKeys) {
             $aFormattedAttributes[] = ['chaves_primarias' => $aPrimaryKeys];
@@ -93,7 +104,6 @@ class SQLExtractor
             $sAttributes = preg_split($sPattern, $sAttributes)[0];
         }
 
-        echo $sAttributes;
         // Realiza um split na vírgula 
         // Entretanto não pode dar split na virgula de atributos como decimal(3,3)
         $aAttributes = preg_split("/(?<=[^0-9])\,/", $sAttributes);
@@ -103,9 +113,6 @@ class SQLExtractor
 
         // $aFormattedAttributes = [];
         foreach ($aAttributes as $key => $sAttribute) {
-            if ($key === count($aAttributes) - 1) {
-                
-            }
             $aFormattedAttributes[] = self::getTableOneAttribute($sAttribute, $sTypes);
         }
         return $aFormattedAttributes;
@@ -154,8 +161,16 @@ class SQLExtractor
         return [
             'nome'  => $aMatches[1][0],
             'tipo'  => $aMatches[2][0],
-            'not null' => !is_null($aMatches[9][0]) ? true : false
+            'not null' => !empty($aMatches[9][0]) ? true : false
         ];
+    }
+
+    /**
+     * Método responsável por limpar o SQL até o primeiro ponto e vírgula encontrado
+     */
+    private function splitToTheSemicolon($sSql)
+    {
+        return preg_split(self::PATTERN_TO_THE_SEMICOLON, $sSql)[1];
     }
 
     /**
