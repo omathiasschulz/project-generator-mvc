@@ -2,7 +2,7 @@
 
 class SQLExtractor
 {
-    const TYPES_NORMAL = ['tinyint', 'int', 'bigint', 'float', 'double', 'date', 'time', 'datetime', 'year'];
+    const TYPES_NORMAL = ['decimal', 'tinyint', 'int', 'bigint', 'float', 'double', 'date', 'time', 'datetime', 'year'];
     const TYPES_WITH_CONFIG_ONE = ['varchar', 'decimal'];
     const TYPES_WITH_CONFIG_TWO = ['decimal'];
 
@@ -12,12 +12,13 @@ class SQLExtractor
     public static function getSQLData($sSqlName)
     {
         $sSql = self::getSQLFromFile($sSqlName);
-        $sDatabaseName = self::getDatabaseName($sSql);
 
-        self::getTables($sSql);
+        $aFormattedDatabase = [
+            'nome'    => self::getDatabaseName($sSql),
+            'tabelas' => self::getTables($sSql)
+        ];
 
-
-        // echo ('sDatabaseName: ' . $sDatabaseName);
+        return $aFormattedDatabase;
     }
     
     /**
@@ -55,10 +56,14 @@ class SQLExtractor
         $sTypes = self::generateTypeAttributes();
         $sTypes = self::generateTypeNotNull($sTypes);
 
+        // $aFormattedTables = [];
         foreach ($aTablesAttributes as $key => $sTableAttributes) {
-            echo '<br><br>=> Tabela ' . $aTablesName[$key] . '<br>';
-            self::getTableAttributes($sTableAttributes, $sTypes);
+            $aFormattedTables[] = [
+                'nome' => $aTablesName[$key],
+                'atributos' => self::getTableAttributes($sTableAttributes, $sTypes)
+            ];
         }
+        return $aFormattedTables;
     }
 
     /**
@@ -67,33 +72,52 @@ class SQLExtractor
     private function getTableAttributes($sAttributes, $sTypes)
     {
         // Remove os parênteses iniciais e finais
-        $sAttributes = trim($sAttributes);
-        $sAttributes = substr($sAttributes, 1, strlen($sAttributes) - 2);
-        echo $sAttributes . '<br>';
-        
-        $aAttributes = explode(',', $sAttributes);
-        var_dump($aAttributes); echo '<br>';
+        // $sAttributes = trim($sAttributes);
+        $sAttributes = substr(trim($sAttributes), 1, strlen($sAttributes) - 2);
+
+        $aPrimaryKeys = self::getTablePrimaryKey($sAttributes);
+        if ($aPrimaryKeys) {
+            $aFormattedAttributes[] = ['chaves_primarias' => $aPrimaryKeys];
+            $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)$/";
+            $sAttributes = preg_split($sPattern, $sAttributes)[0];
+        }
+
+        echo $sAttributes;
+        // Realiza um split na vírgula 
+        // Entretanto não pode dar split na virgula de atributos como decimal(3,3)
+        $aAttributes = preg_split("/(?<=[^0-9])\,/", $sAttributes);
+        // var_dump($aAttributes); echo '<br>';
+
+        // echo '<pre>' , var_dump($variable) , '</pre>';
+
+        // $aFormattedAttributes = [];
         foreach ($aAttributes as $key => $sAttribute) {
             if ($key === count($aAttributes) - 1) {
                 
-            } else {
-                self::getTableOneAttribute($sAttribute, $sTypes);
             }
+            $aFormattedAttributes[] = self::getTableOneAttribute($sAttribute, $sTypes);
         }
-
-        
+        return $aFormattedAttributes;
     }
     
+    /**
+     * Método responsável por verificar se possui chave primária
+     * Caso possuir, pega as chaves primárias, se não pega o atributo
+     */
     private function getTablePrimaryKey($sAttribute)
     {
+        // echo '<br>AAAAAAAAAAAAAAAAAAAAa<br>';
+        $sAttribute = trim($sAttribute);
+        // if (strpos($a, 'are') !== false) {
+        //     echo 'true';
+        // }
+        // primary key(chave_primaria, chave_primaria2)
+
         // $sAttribute = trim($sAttribute);
-        // $sPattern = "/(?i)^([a-zA-Z0-9_-]+)[[:space:]]+" . $sTypes . "$/";
-        // preg_match_all($sPattern, $sAttribute, $aMatches);
+        $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)$/";
+        preg_match_all($sPattern, $sAttribute, $aMatches);
 
-        // // var_dump($aMatches);
-        // $sNomeVariavel = $aMatches[1][0];
-        // $sTipoVariavel = $aMatches[2][0];
-
+        return !is_null($aMatches[1][0]) ? explode(',', $aMatches[1][0]) : false;
     }
 
     private function getTableOneAttribute($sAttribute, $sTypes)
@@ -102,10 +126,25 @@ class SQLExtractor
         $sPattern = "/(?i)^([a-zA-Z0-9_-]+)[[:space:]]+" . $sTypes . "$/";
         preg_match_all($sPattern, $sAttribute, $aMatches);
 
-        // var_dump($aMatches);
-        $sNomeVariavel = $aMatches[1][0];
-        $sTipoVariavel = $aMatches[2][0];
+        // echo '<br><br>';
+        // var_dump($sPattern);
+        // echo '<br><br>';
 
+        // echo '<br><br>';
+        // var_dump($aMatches);
+        // echo '<br>';
+
+        // $sNomeVariavel = $aMatches[1][0];
+        // echo '<br>$sNomeVariavel: ' . $sNomeVariavel;
+        // $sTipoVariavel = $aMatches[2][0];
+        // echo '<br>$sTipoVariavel: ' . $sTipoVariavel;
+        // $sNotNull = $aMatches[9][0];
+        // echo '<br>$sNotNull: ' . $sNotNull;
+        return [
+            'nome'  => $aMatches[1][0],
+            'tipo'  => $aMatches[2][0],
+            'not null' => !is_null($aMatches[9][0]) ? true : false
+        ];
     }
 
     /**
@@ -138,6 +177,6 @@ class SQLExtractor
      */
     private function generateTypeNotNull($sTypes)
     {
-        return $sTypes . '([[:space:]]*|[[:space:]]+not null[[:space:]]*)';
+        return $sTypes . '([[:space:]]*|[[:space:]]+not[[:space:]]+null[[:space:]]*)';
     }
 }

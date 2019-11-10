@@ -2,4 +2,11 @@
 
 require_once('SQLExtractor.php');
 
-SQLExtractor::getSQLData('sql.sql');
+$aDatabase = SQLExtractor::getSQLData('sql.sql');
+
+echo '<pre>' , var_dump($aDatabase) , '</pre>';
+
+
+echo $aDatabase['nome'];
+
+echo '<pre>' , var_dump($aDatabase['tabelas'][0]) , '</pre>';
