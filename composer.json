@@ -1,0 +1,18 @@
+{
+    "autoload": {
+        "psr-4": {
+            "helpers\\": [
+                "helpers/"
+            ],
+            "generator\\": [
+                "generator/"
+            ],
+            "core\\": [
+                "core/"
+            ],
+            "app\\": [
+                "app/"
+            ]
+        }
+    }
+}

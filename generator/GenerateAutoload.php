@@ -1,6 +1,8 @@
 <?php
 
-require_once('Helpers.php');
+namespace generator;
+
+use helpers\Helpers;
 
 class GenerateAutoload
 {

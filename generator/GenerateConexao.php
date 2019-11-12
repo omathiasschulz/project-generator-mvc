@@ -1,6 +1,7 @@
 <?php
 
-require_once('Helpers.php');
+namespace generator;
+// require_once('Helpers.php');
 
 class GenerateConexao
 {

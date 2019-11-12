@@ -1,5 +1,7 @@
 <?php
 
+namespace helpers;
+
 class SQLExtractor
 {
     // Regex que pega tudo até o primeiro ponto e vírgula
@@ -11,7 +13,7 @@ class SQLExtractor
 
     /**
      * Método principal que retornará o nome do banco, as tabelas e os atributos de cada tabela
-     * Retorna um array, no qual a primeira posição determina se a operação foi realizada 
+     * Retorna um json, no qual a primeira posição determina se a operação foi realizada 
      * com sucesso ou não, a segunda posição é a resposta
      */
     public static function getSQLData($sSqlName)
@@ -31,8 +33,8 @@ class SQLExtractor
             'nome'    => $aDatabaseName[1],
             'tabelas' => $aTables[1]
         ];
-
-        return [true, $aFormattedDatabase];
+        
+        return json_encode([true, $aFormattedDatabase]);
     }
     
     /**
