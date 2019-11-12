@@ -8,44 +8,38 @@ use generator\GenerateConexao;
 use generator\GenerateIndex;
 use generator\GenerateRoutes;
 use generator\GenerateController;
-use Helpers\SQLExtractor;
+use helpers\SQLExtractor;
 
 class Generate
 {
-    const SQL = '../sql.sql';
-    const JSON = '../generator.json';
-    const AUTOLOAD_NAME = '../autoload.php';
+    const SQL = 'sql.sql';
 
     /**
      * Método principal
      */
     public static function start()
     {
-        if (!file_exists(__DIR__ . '/' . self::JSON))
-            return [false, 'Arquivo ' . self::JSON . ' não existe!'];
-        $json = self::getFile();
+        $aSQL = self::getFile();
+        if (!$aSQL)
+            return $aSQL;
+        $aDatabase = $aSQL[1];
 
-        var_dump($json);
-        // $json->nome;
-        // $json['nome'];
-        // var_dump($json);
-        // $aDatabase = SQLExtractor::getSQLData(self::SQL);
-
-
-        GenerateAutoload::create(self::AUTOLOAD_NAME, $json->folders, ['conexao', 'core']);
+        GenerateRoutes::create($aDatabase->tabelas);
+        // GenerateController::create($aDatabase->tabelas);
+        // GenerateAutoload::create(self::AUTOLOAD_NAME, $json->folders, ['conexao', 'core']);
         // GenerateFolders::create($json->folders);
         // GenerateConexao::create($json->pdo);
         // GenerateIndex::create(self::AUTOLOAD_NAME);
-        // GenerateRoutes::create(self::AUTOLOAD_NAME, $json->routes);
 
-        return [true, 'Projeto gerado com sucesso.'];
+        // return [true, 'Projeto gerado com sucesso.'];
     }
 
     /**
-     * Método que realiza a leitura do arquivo json
+     * Método que realiza a leitura do arquivo do arquivo SQL
      */
     private function getFile()
     {
-        return json_decode(file_get_contents(__DIR__ . '/' . self::JSON, 'r'));
+        $path = '..' . DIRECTORY_SEPARATOR;
+        return json_decode(SQLExtractor::getSQLData($path . self::SQL));
     }
 }
