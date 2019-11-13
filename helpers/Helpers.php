@@ -80,11 +80,11 @@ class Helpers
     public static function createMethod($sName, $sAttributes, $sBody, $sVisibility = 'public')
     {
         $method = new StringBuilder();
-        $method->append("\n" . $sVisibility . " function " . $sName);
+        $method->append("\n\t" . $sVisibility . " function " . $sName);
         $method->append("(" . $sAttributes . ")");
-        $method->append("\n{ ");
+        $method->append("\n\t{ ");
         $method->append("\n" . $sBody);
-        $method->append("\n} \n");
+        $method->append("\n\t} \n");
         return $method;
     }
 }
