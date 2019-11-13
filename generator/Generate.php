@@ -2,10 +2,6 @@
 
 namespace generator;
 
-use generator\GenerateAutoload;
-use generator\GenerateFolders;
-use generator\GenerateConexao;
-use generator\GenerateIndex;
 use generator\GenerateRoutes;
 use generator\GenerateController;
 use helpers\SQLExtractor;
@@ -26,6 +22,7 @@ class Generate
 
         GenerateRoutes::create($aDatabase->tabelas);
         GenerateController::create($aDatabase->tabelas);
+        GenerateModel::create($aDatabase->tabelas);
 
         return [true, 'Projeto gerado com sucesso.'];
     }

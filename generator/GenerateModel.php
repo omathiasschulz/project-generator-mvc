@@ -9,6 +9,7 @@ class GenerateModel
      */
     public function create($aTabelas)
     {
-        
+        var_dump($aTabelas);
+        echo $aTabelas[0]->nome;
     }
 }
