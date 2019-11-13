@@ -27,4 +27,64 @@ class Helpers
             mkdir($completePathFolder, 0777, true);
         }
     }
+
+    /**
+     * Método responsável por criar uma classe a partir dos parâmetros apresentados
+     * 
+     * @param $sName => Nome da classe
+     * @param $sBody => Conteúdo da classe
+     * @param $sPath => Caminho no qual a classe será criada (a partir da pasta inicial do projeto)
+     * @param $aComposerUses => Caminho e a classe que são utilizadas dentro da classe que está
+     *                          sendo criada. Se tiver extends e implements deve ser específicado 
+     *                          também. Exemplo: [helpers\\StringBuilder, helpers\\Helpers];
+     * @param $sExtendClass => Classe pai da classe atual
+     * @param $sImplementClass => Classe que será implementada pela classe atual
+     */
+    public static function createClass
+    (
+        $sName, 
+        $sBody, 
+        $sPath, 
+        $aComposerUses = null,
+        $sExtendClass = null, 
+        $sImplementClass = null
+    ) {
+        $class = new StringBuilder();
+        $class->append("<?php");
+        $namespace = str_replace("/", "\\", substr($sPath, 0, strlen($sPath) - 1));
+        $class->append("\n\nnamespace " . $namespace . ";\n");
+        if (!is_null($aComposerUses)) {
+            foreach ($aComposerUses as $use) {
+                $class->append("\nuse " . $use . ";");
+            }
+            $class->append("\n");
+        }
+        $class->append("\nclass " . $sName);
+        if (!is_null($sExtendClass)) {
+            $class->append(" extends " . $sExtendClass);
+        }
+        if (!is_null($sImplementClass)) {
+            $class->append(" implements " . $sImplementClass);
+        }
+        $class->append("\n{ ");
+        $class->append("\n" . $sBody);
+        $class->append("\n}\n");
+
+        Helpers::createFolder($sPath);
+        Helpers::writeFile($sPath . $sName .'.php', $class);
+    }
+
+    /**
+     * Método responsável por criar um método
+     */
+    public static function createMethod($sName, $sAttributes, $sBody, $sVisibility = 'public')
+    {
+        $method = new StringBuilder();
+        $method->append("\n" . $sVisibility . " function " . $sName);
+        $method->append("(" . $sAttributes . ")");
+        $method->append("\n{ ");
+        $method->append("\n" . $sBody);
+        $method->append("\n} \n");
+        return $method;
+    }
 }

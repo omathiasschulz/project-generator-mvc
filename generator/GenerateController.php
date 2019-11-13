@@ -2,6 +2,10 @@
 
 namespace generator;
 
+use core\AbsController;
+use helpers\Helpers;
+use helpers\StringBuilder;
+
 class GenerateController 
 {
     /**
@@ -9,7 +13,39 @@ class GenerateController
      */
     public function create($aTabelas)
     {
-        // Cada controller possuirá 5 métodos
+        // Helpers::createFolder('app/controller');
+
+        foreach ($aTabelas as $key => $oTabela) {
+            // var_dump($oTabela);
+            // $controller = "<?php\n"
+            //     . "\nclass LaunchController extends AbsController \n{";
+            
+            // $controller .= "\n}";
+            // $controller = new StringBuilder();
+            // $controller->append("<?php\n");
+            // $controller->append("\nclass LaunchController extends AbsController \n{");
+            // $controller->append("\n");
+            // $controller->append("\n} ");
+            // Helpers::writeFile('app/controller/' . ucfirst($oTabela->nome) .'Controller.php', $controller);
+
+            Helpers::createClass(
+                ucfirst($oTabela->nome)."Controller", 
+                "    //corpo da classe", 
+                'app/controller/',
+                [
+                    "core\\AbsController",
+                    "core\\Redirecionador"
+                ],
+                'AbsController'
+            );
+        }
+        // $routes .= "\nreturn \$route;\n";
+
+    }
+
+    public function defaultMethods()
+    {
+
     }
 
     // /**
