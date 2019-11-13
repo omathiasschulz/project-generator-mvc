@@ -26,12 +26,8 @@ class Generate
 
         GenerateRoutes::create($aDatabase->tabelas);
         GenerateController::create($aDatabase->tabelas);
-        // GenerateAutoload::create(self::AUTOLOAD_NAME, $json->folders, ['conexao', 'core']);
-        // GenerateFolders::create($json->folders);
-        // GenerateConexao::create($json->pdo);
-        // GenerateIndex::create(self::AUTOLOAD_NAME);
 
-        // return [true, 'Projeto gerado com sucesso.'];
+        return [true, 'Projeto gerado com sucesso.'];
     }
 
     /**
