@@ -69,8 +69,9 @@ class Helpers
         }
         $class->appendNL("\n{")
             ->appendNL($sBody)
-            ->appendNL("}");
-
+            ->appendNL("}")
+            ->generateIdentation();
+        
         Helpers::createFolder($sPath);
         Helpers::writeFile($sPath . $sName .'.php', $class);
     }

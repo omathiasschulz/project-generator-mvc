@@ -82,10 +82,10 @@ class GenerateModel
         $oBody->appendNL("return '### " . ucfirst($sNomeTabela) . " <'");
         foreach ($aAtributos as $oAtributo) {
             $oBody->appendNL(
-                ". ' | " . $oAtributo->nome . " = ' . " . "\$this->get" . ucfirst($oAtributo->nome) . "()"
+                "\t. ' | " . $oAtributo->nome . " = ' . " . "\$this->get" . ucfirst($oAtributo->nome) . "()"
             );
         }
-        $oBody->append(". ' | >';");
+        $oBody->append("\t. ' | >';");
         return Helpers::createMethod('__toString', null, $oBody);
     }
 
