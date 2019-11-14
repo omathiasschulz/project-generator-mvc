@@ -16,7 +16,7 @@ class Generate
     public static function start()
     {
         $aSQL = self::getFile();
-        if (!$aSQL)
+        if (!$aSQL[0])
             return $aSQL;
         $aDatabase = $aSQL[1];
 

@@ -22,12 +22,12 @@ class SQLExtractor
 
         $aDatabaseName = self::getDatabaseName($sSql);
         if (!$aDatabaseName[0])
-            return $aDatabaseName;
+            return json_encode($aDatabaseName);
         $sSql = self::splitToTheSemicolon($sSql);
 
         $aTables = self::getTables($sSql);
         if (!$aTables[0])
-            return $aTables;
+            return json_encode($aTables);
         
         $aFormattedDatabase = [
             'nome'    => $aDatabaseName[1],
@@ -150,7 +150,7 @@ class SQLExtractor
     private function getTableOneAttribute($sAttribute, $sTypes)
     {
         $sAttribute = trim($sAttribute);
-        $sPattern = "/(?i)^([a-zA-Z0-9_-]+)[[:space:]]+" . $sTypes . "$/";
+        $sPattern = "/(?i)^([a-zA-Z0-9_-]+)[[:space:]]+" . $sTypes . "(auto_increment[[:space:]]*|)$/";
         preg_match_all($sPattern, $sAttribute, $aMatches);
 
         if (!isset($aMatches[1][0]) || !isset($aMatches[2][0]))
@@ -161,7 +161,7 @@ class SQLExtractor
             [
                 'nome'     => $aMatches[1][0],
                 'tipo'     => $aMatches[2][0],
-                'not null' => !empty($aMatches[9][0]) ? true : false
+                'not_null' => !empty($aMatches[9][0]) ? true : false
             ]
         ];
     }
