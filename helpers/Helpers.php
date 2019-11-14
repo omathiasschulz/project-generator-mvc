@@ -49,15 +49,16 @@ class Helpers
         $sExtendClass = null, 
         $sImplementClass = null
     ) {
-        $class = new StringBuilder();
-        $class->append("<?php");
         $namespace = str_replace("/", "\\", substr($sPath, 0, strlen($sPath) - 1));
-        $class->append("\n\nnamespace " . $namespace . ";\n");
+        
+        $class = new StringBuilder();
+        $class->appendNL("<?php")
+            ->appendNL("\nnamespace " . $namespace . ";");
         if (!is_null($aComposerUses)) {
-            foreach ($aComposerUses as $use) {
-                $class->append("\nuse " . $use . ";");
-            }
             $class->append("\n");
+            foreach ($aComposerUses as $use) {
+                $class->appendNL("use " . $use . ";");
+            }
         }
         $class->append("\nclass " . $sName);
         if (!is_null($sExtendClass)) {
@@ -66,9 +67,9 @@ class Helpers
         if (!is_null($sImplementClass)) {
             $class->append(" implements " . $sImplementClass);
         }
-        $class->append("\n{ ");
-        $class->append("\n" . $sBody);
-        $class->append("\n}\n");
+        $class->appendNL("\n{")
+            ->appendNL($sBody)
+            ->appendNL("}");
 
         Helpers::createFolder($sPath);
         Helpers::writeFile($sPath . $sName .'.php', $class);
@@ -80,11 +81,10 @@ class Helpers
     public static function createMethod($sName, $sAttributes, $sBody, $sVisibility = 'public')
     {
         $method = new StringBuilder();
-        $method->append("\n\t" . $sVisibility . " function " . $sName);
-        $method->append("(" . $sAttributes . ")");
-        $method->append("\n\t{ ");
-        $method->append("\n" . $sBody);
-        $method->append("\n\t} \n");
+        $method->appendNL("\n" . $sVisibility . " function " . $sName . "(" . $sAttributes . ")")
+            ->appendNL("{")
+            ->appendNL($sBody)
+            ->appendNL("}");
         return $method;
     }
 }
