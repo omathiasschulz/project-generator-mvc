@@ -10,9 +10,7 @@ class StringBuilder
     protected $string;
 
     /**
-     * Create a new string builder object.
-     *
-     * @param string|null $string   The initial sequence
+     * Create a new string builder object
      */
     public function __construct($string = '')
     {
@@ -20,34 +18,45 @@ class StringBuilder
     }
 
     /**
-     * Append a string to the sequence.
-     *
-     * @param string $string The sequence to append.
-     *
-     * @return StringBuilder
+     * Append a string to the sequence
      */
     public function append($string)
     {
-        // $string = static::convertString($string, $this->encoding);
-
         $this->string .= $string;
 
         return $this;
     }
 
     /**
+     * Append a string and a new line to the sequence
+     */
+    public function appendNL($string)
+    {
+        $this->string .= $string . "\n";
+
+        return $this;
+    }
+
+    /**
+     * Get a sub string
+     */
+    public function subString($initialPosition, $finalPosition)
+    {
+        $this->string = substr($this->string, $initialPosition, $finalPosition);
+
+        return $this;
+    }
+
+    /**
 	 * Returns the whole resulting string
-	 *
-	 * @return string
 	 */
 	public function build()
 	{
 		return $this->string;
-	}
+    }
+    
 	/**
 	 * Returns the whole resulting string
-	 *
-	 * @return string
 	 */
 	public function __toString()
 	{
