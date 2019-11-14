@@ -25,17 +25,17 @@ class GenerateModel
      */
     private function generateDto($sNomeTabela, $aAtributos)
     {
-        $sBody = self::generateDtoAttributes($aAtributos);
+        $oBody = new StringBuilder();
+        $oBody->append(self::generateDtoAttributes($aAtributos));
         foreach ($aAtributos as $oAtributo) {
-            $sBody .= ""
-                . self::generateDtoGet($oAtributo->nome)
-                . self::generateDtoSet($oAtributo->nome);
+            $oBody->append(self::generateDtoGet($oAtributo->nome))
+                ->append(self::generateDtoSet($oAtributo->nome));
         }
-        $sBody .= self::generateDtoToString($sNomeTabela, $aAtributos);
+        $oBody->append(self::generateDtoToString($sNomeTabela, $aAtributos));
         
         Helpers::createClass(
             ucfirst($sNomeTabela),
-            $sBody,
+            $oBody,
             'app/model/dto/'
         );
     }
@@ -45,11 +45,11 @@ class GenerateModel
      */
     private function generateDtoAttributes($aAtributos)
     {
-        $sBody = new StringBuilder();
+        $oBody = new StringBuilder();
         foreach ($aAtributos as $oAtributo) {
-            $sBody->append("\tprivate \$" . $oAtributo->nome . ";\n");
+            $oBody->appendNL("private \$" . $oAtributo->nome . ";");
         }
-        return $sBody;
+        return $oBody;
     }
 
     /**
@@ -57,9 +57,9 @@ class GenerateModel
      */
     private function generateDtoGet($sAtributo)
     {
-        $sBody = new StringBuilder();
-        $sBody->append("\t\treturn \$this->" . $sAtributo . ";");
-        return Helpers::createMethod("get" . ucfirst($sAtributo), null, $sBody);
+        $oBody = new StringBuilder();
+        $oBody->append("return \$this->" . $sAtributo . ";");
+        return Helpers::createMethod("get" . ucfirst($sAtributo), null, $oBody);
     }
 
     /**
@@ -67,10 +67,10 @@ class GenerateModel
      */
     private function generateDtoSet($sAtributo)
     {
-        $sBody = new StringBuilder();
-        $sBody->append("\t\t\$this->" . $sAtributo . " = \$" . $sAtributo . ";\n");
-        $sBody->append("\t\treturn \$this;");
-        return Helpers::createMethod("set" . ucfirst($sAtributo), "\$" . $sAtributo, $sBody);
+        $oBody = new StringBuilder();
+        $oBody->appendNL("\$this->" . $sAtributo . " = \$" . $sAtributo . ";")
+            ->append("return \$this;");
+        return Helpers::createMethod("set" . ucfirst($sAtributo), "\$" . $sAtributo, $oBody);
     }
 
     /**
@@ -78,15 +78,15 @@ class GenerateModel
      */
     private function generateDtoToString($sNomeTabela, $aAtributos)
     {
-        $sBody = new StringBuilder();
-        $sBody->append("\t\treturn '### " . ucfirst($sNomeTabela) . " <'\n");
+        $oBody = new StringBuilder();
+        $oBody->appendNL("return '### " . ucfirst($sNomeTabela) . " <'");
         foreach ($aAtributos as $oAtributo) {
-            $sBody->append(
-                "\t\t\t. ' | " . $oAtributo->nome . " = ' . " . "\$this->get" . ucfirst($oAtributo->nome) . "()\n"
+            $oBody->appendNL(
+                ". ' | " . $oAtributo->nome . " = ' . " . "\$this->get" . ucfirst($oAtributo->nome) . "()"
             );
         }
-        $sBody->append("\t\t\t. ' | >';");
-        return Helpers::createMethod('__toString', null, $sBody);
+        $oBody->append(". ' | >';");
+        return Helpers::createMethod('__toString', null, $oBody);
     }
 
     /**
@@ -96,13 +96,13 @@ class GenerateModel
     {
         $aFields = self::generateDaoFields($sNomeTabela, $aAtributos);
 
-        $sBody = new StringBuilder();
-        $sBody->appendNL("const NOME_TABELA = '" . $sNomeTabela . "';")
+        $oBody = new StringBuilder();
+        $oBody->appendNL("const NOME_TABELA = '" . $sNomeTabela . "';")
             ->append(self::generateDaoInsert($sNomeTabela, $aAtributos, $aFields));
         
         Helpers::createClass(
             ucfirst($sNomeTabela . "DAO"),
-            $sBody,
+            $oBody,
             "app/model/dao/",
             [
                 "app\\model\\dto\\".ucfirst($sNomeTabela),
@@ -145,8 +145,8 @@ class GenerateModel
 
     private function generateDaoInsert($sNomeTabela, $aAtributos, $aFields)
     {
-        $sBody = new StringBuilder();
-        $sBody->appendNL("try {")
+        $oBody = new StringBuilder();
+        $oBody->appendNL("try {")
             ->appendNL("\$sql = 'INSERT INTO' . self::NOME_TABELA")
             ->appendNL($aFields['sFieldsInsert'])
             ->appendNL($aFields['sFieldsValues'])
@@ -161,6 +161,6 @@ class GenerateModel
             ->appendNL("\$pdo = null;")
             ->append("}");
 
-        return Helpers::createMethod('insert', "\$".$sNomeTabela, $sBody);
+        return Helpers::createMethod('insert', "\$".$sNomeTabela, $oBody);
     }
 }

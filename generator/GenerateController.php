@@ -30,15 +30,15 @@ class GenerateController
      */
     private function defaultMethods($sTableName)
     {
-        $sBody = ""
-            . self::defaultMethodCadastrar($sTableName)
-            . self::defaultMethodInserir($sTableName)
-            . self::defaultMethodVisualizar($sTableName)
-            . self::defaultMethodAtualizar($sTableName)
-            . self::defaultMethodDeletar($sTableName)
-            . self::defaultMethodListar($sTableName);
+        $body = new StringBuilder();
+        $body->append(self::defaultMethodCadastrar($sTableName))
+            ->append(self::defaultMethodInserir($sTableName))
+            ->append(self::defaultMethodVisualizar($sTableName))
+            ->append(self::defaultMethodAtualizar($sTableName))
+            ->append(self::defaultMethodDeletar($sTableName))
+            ->append(self::defaultMethodListar($sTableName));
         
-        return $sBody;
+        return $body;
     }
 
     /**
@@ -48,9 +48,8 @@ class GenerateController
     private function defaultMethodCadastrar($sTableName)
     {
         $body = new StringBuilder();
-        $body->append(
-            "\t\t\$this->requisitarView('" . $sTableName . "/cadastrar', 'baseHtml');"
-        );
+        $body->append("\$this->requisitarView('" . $sTableName . "/cadastrar', 'baseHtml');");
+
         return Helpers::createMethod("cadastrar", null, $body);
     }
 
@@ -62,7 +61,7 @@ class GenerateController
     {
         $body = new StringBuilder();
         $body->append(
-            "\t\t// metodo inserir"
+            "// metodo inserir"
         );
         return Helpers::createMethod("inserir", "\$request", $body);
     }
@@ -75,7 +74,7 @@ class GenerateController
     {
         $body = new StringBuilder();
         $body->append(
-            "\t\t// metodo visualizar"
+            "// metodo visualizar"
         );
         return Helpers::createMethod("visualizar", "\$id", $body);
     }
@@ -88,7 +87,7 @@ class GenerateController
     {
         $body = new StringBuilder();
         $body->append(
-            "\t\t// metodo atualizar"
+            "// metodo atualizar"
         );
         return Helpers::createMethod("atualizar", "\$id", $body);
     }
@@ -101,7 +100,7 @@ class GenerateController
     {
         $body = new StringBuilder();
         $body->append(
-            "\t\t// metodo deletar"
+            "// metodo deletar"
         );
         return Helpers::createMethod("deletar", "\$id", $body);
     }
@@ -114,7 +113,7 @@ class GenerateController
     {
         $body = new StringBuilder();
         $body->append(
-            "\t\t// metodo listar"
+            "// metodo listar"
         );
         return Helpers::createMethod("listar", null, $body);
     }
