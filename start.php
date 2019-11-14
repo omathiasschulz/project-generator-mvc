@@ -1,6 +1,8 @@
 <?php
 
-require_once('Generate.php');
+require_once "vendor/autoload.php";
+
+use generator\Generate;
 
 $result = Generate::start();
 

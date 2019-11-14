@@ -1,5 +1,7 @@
 <?php
 
+namespace helpers;
+
 class SQLExtractor
 {
     // Regex que pega tudo até o primeiro ponto e vírgula
@@ -11,7 +13,7 @@ class SQLExtractor
 
     /**
      * Método principal que retornará o nome do banco, as tabelas e os atributos de cada tabela
-     * Retorna um array, no qual a primeira posição determina se a operação foi realizada 
+     * Retorna um json, no qual a primeira posição determina se a operação foi realizada 
      * com sucesso ou não, a segunda posição é a resposta
      */
     public static function getSQLData($sSqlName)
@@ -20,19 +22,19 @@ class SQLExtractor
 
         $aDatabaseName = self::getDatabaseName($sSql);
         if (!$aDatabaseName[0])
-            return $aDatabaseName;
+            return json_encode($aDatabaseName);
         $sSql = self::splitToTheSemicolon($sSql);
 
         $aTables = self::getTables($sSql);
         if (!$aTables[0])
-            return $aTables;
+            return json_encode($aTables);
         
         $aFormattedDatabase = [
             'nome'    => $aDatabaseName[1],
             'tabelas' => $aTables[1]
         ];
-
-        return [true, $aFormattedDatabase];
+        
+        return json_encode([true, $aFormattedDatabase]);
     }
     
     /**
@@ -148,7 +150,7 @@ class SQLExtractor
     private function getTableOneAttribute($sAttribute, $sTypes)
     {
         $sAttribute = trim($sAttribute);
-        $sPattern = "/(?i)^([a-zA-Z0-9_-]+)[[:space:]]+" . $sTypes . "$/";
+        $sPattern = "/(?i)^([a-zA-Z0-9_-]+)[[:space:]]+" . $sTypes . "(auto_increment[[:space:]]*|)$/";
         preg_match_all($sPattern, $sAttribute, $aMatches);
 
         if (!isset($aMatches[1][0]) || !isset($aMatches[2][0]))
@@ -159,7 +161,7 @@ class SQLExtractor
             [
                 'nome'     => $aMatches[1][0],
                 'tipo'     => $aMatches[2][0],
-                'not null' => !empty($aMatches[9][0]) ? true : false
+                'not_null' => !empty($aMatches[9][0]) ? true : false
             ]
         ];
     }
