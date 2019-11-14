@@ -2,23 +2,17 @@
 
 namespace helpers;
 
-/**
- * StringBuilder for PHP provide string manipulation logic in an object.
- */
 class StringBuilder
 {
     protected $string;
 
-    /**
-     * Create a new string builder object
-     */
-    public function __construct($string = '')
+    public function __construct($string = "")
     {
         $this->string = $string;
     }
 
     /**
-     * Append a string to the sequence
+     * Método responsável por receber uma string e concatenar com a string atual
      */
     public function append($string)
     {
@@ -28,7 +22,8 @@ class StringBuilder
     }
 
     /**
-     * Append a string and a new line to the sequence
+     * Método responsável por receber uma string e concatenar com a string atual
+     * e no final realizar uma quebra de linha
      */
     public function appendNL($string)
     {
@@ -38,7 +33,7 @@ class StringBuilder
     }
 
     /**
-     * Get a sub string
+     * Método responsável por pegar a substring da string atual
      */
     public function subString($initialPosition, $finalPosition)
     {
@@ -48,7 +43,32 @@ class StringBuilder
     }
 
     /**
-	 * Returns the whole resulting string
+     * Método responsável por realizar a identação de uma string de acordo com os
+     * colchetes da string
+     */
+    public function generateIdentation($initialSpacing = 0)
+    {
+        $aString = explode("\n", $this->string);
+
+        foreach ($aString as &$string) {
+            if (strpos($string, '}') !== false)
+                $initialSpacing--;
+            
+            $tabs = "";
+            for ($i = 0; $i < $initialSpacing; $i++)
+                $tabs .= "\t";
+            
+            $string = $tabs . $string;
+            if (strpos($string, '{') !== false)
+                $initialSpacing++;
+        }
+        $this->string = implode("\n", $aString);
+        
+        return $this;
+    }
+
+    /**
+	 * Método responsável por retornar a string
 	 */
 	public function build()
 	{
@@ -56,7 +76,7 @@ class StringBuilder
     }
     
 	/**
-	 * Returns the whole resulting string
+	 * Método mágico que retorna a string
 	 */
 	public function __toString()
 	{
