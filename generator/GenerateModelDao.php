@@ -10,22 +10,23 @@ class GenerateModelDao
     /**
      * Método responsável por gerar a classe dao de uma tabela
      */
-    public function create($sTabelaNome, $aTabelaAtributos, $aTabelaChavesPrimarias)
+    public function create($sTableName, $aTableAttributes, $aTablePrimaryKeys)
     {
-        $aFields = self::generateDaoFields($sTabelaNome, $aTabelaAtributos);
+        $aFields = self::generateDaoFields($sTableName, $aTableAttributes);
+        $sFieldsPrimaryKey = self::generateDaoFieldsPrimaryKey($sTableName, $aTablePrimaryKeys);
 
         $oBody = new StringBuilder();
-        $oBody->appendNL("const NOME_TABELA = '" . $sTabelaNome . "';")
-            ->append(self::generateDaoInsert($sTabelaNome, $aFields))
-            ->append(self::generateDaoUpdate($sTabelaNome, $aFields))
-            ->append(self::generateDaoDelete($sTabelaNome, $aTabelaChavesPrimarias));
+        $oBody->appendNL("const NOME_TABELA = '" . $sTableName . "';")
+            ->append(self::generateDaoInserir($sTableName, $aFields))
+            ->append(self::generateDaoAtualizar($sTableName, $aFields))
+            ->append(self::generateDaoDeletar($sTableName, $sFieldsPrimaryKey));
         
         Helpers::createClass(
-            ucfirst($sTabelaNome . "DAO"),
+            ucfirst($sTableName . "DAO"),
             $oBody,
             "app/model/dao/",
             [
-                "app\\model\\dto\\".ucfirst($sTabelaNome),
+                "app\\model\\dto\\".ucfirst($sTableName),
                 "app\conexao\\Conexao",
                 "app\\model\\interfaces\\IGenericDB",
                 "PDO"
@@ -38,73 +39,67 @@ class GenerateModelDao
     /**
      * Método responsável por gerar as strins dos respectivos campos
      */
-    private function generateDaoFields($sNomeTabela, $aAtributos)
+    private function generateDaoFields($sName, $aAttributes)
     {
-        $sFieldsInsert = new StringBuilder(" . '(");
-        $sFieldsValues = new StringBuilder(" . 'VALUES (");
-        $sFieldsBind = new StringBuilder();
-        $sFieldsGet = new StringBuilder();
-        foreach ($aAtributos as $oAtributo) {
-            $sFieldsInsert->append($oAtributo->nome . ", ");
-            $sFieldsValues->append(":" . $oAtributo->nome . ", ");
-            $sFieldsBind->appendNL("\$stmt->bindParam(':" . $oAtributo->nome . "', \$" . $oAtributo->nome . ", PDO::PARAM_STR);");
-            $sFieldsGet->appendNL("\$" . $oAtributo->nome . " = \$" . $sNomeTabela . "->get" . ucfirst($oAtributo->nome) . "();");
+        $oFieldsInsert = new StringBuilder(" . '(");
+        $oFieldsValues = new StringBuilder(" . 'VALUES (");
+        $oFieldsBind = new StringBuilder();
+        $oFieldsGet = new StringBuilder();
+        foreach ($aAttributes as $oAttribute) {
+            $oFieldsInsert->append($oAttribute->nome . ", ");
+            $oFieldsValues->append(":" . $oAttribute->nome . ", ");
+            $oFieldsBind->appendNL("\$stmt->bindParam(':" . $oAttribute->nome . "', \$" . $oAttribute->nome . ", PDO::PARAM_STR);");
+            $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "();");
         }
-        $sFieldsInsert->subString(0, strlen($sFieldsInsert)-2)
+        $oFieldsInsert->subString(0, strlen($oFieldsInsert)-2)
                     ->append(")' ");
-        $sFieldsValues->subString(0, strlen($sFieldsValues)-2)
+        $oFieldsValues->subString(0, strlen($oFieldsValues)-2)
                     ->append(")'; ");
 
         return [
-            'sFieldsInsert' => $sFieldsInsert,
-            'sFieldsValues' => $sFieldsValues,
-            'sFieldsBind'   => $sFieldsBind,
-            'sFieldsGet'    => $sFieldsGet
+            'oFieldsInsert' => $oFieldsInsert,
+            'oFieldsValues' => $oFieldsValues,
+            'oFieldsBind'   => $oFieldsBind,
+            'oFieldsGet'    => $oFieldsGet
         ];
     }
 
     /**
-     * Método responsável por gerar as strins dos respectivos campos
+     * Método responsável por gerar as strins das chaves primárias
      */
-    private function generateDaoFieldsPrimaryKey($sNomeTabela, $aChavesPrimarias)
+    private function generateDaoFieldsPrimaryKey($sName, $aPrimaryKeys)
     {
-        $sFieldsInsert = new StringBuilder(" . '(");
-        $sFieldsValues = new StringBuilder(" . 'VALUES (");
-        $sFieldsBind = new StringBuilder();
-        $sFieldsGet = new StringBuilder();
-        foreach ($aAtributos as $oAtributo) {
-            $sFieldsInsert->append($oAtributo->nome . ", ");
-            $sFieldsValues->append(":" . $oAtributo->nome . ", ");
-            $sFieldsBind->appendNL("\$stmt->bindParam(':" . $oAtributo->nome . "', \$" . $oAtributo->nome . ", PDO::PARAM_STR);");
-            $sFieldsGet->appendNL("\$" . $oAtributo->nome . " = \$" . $sNomeTabela . "->get" . ucfirst($oAtributo->nome) . "();");
+        $oFieldsWhere = new StringBuilder();
+        $oFieldsBind = new StringBuilder();
+        $oFieldsGet = new StringBuilder();
+        foreach ($aPrimaryKeys as $sPrimaryKey) {
+            $oFieldsWhere->append($sPrimaryKey . " = :" . $sPrimaryKey . " AND ");
+            $oFieldsBind->appendNL("\$stmt->bindParam(':" . $sPrimaryKey . "', \$" . $sPrimaryKey . ");");
+            $oFieldsGet->appendNL("\$" . $sPrimaryKey . " = \$" . $sName . "->get" . ucfirst($sPrimaryKey) . "();");
         }
-        $sFieldsInsert->subString(0, strlen($sFieldsInsert)-2)
-                    ->append(")' ");
-        $sFieldsValues->subString(0, strlen($sFieldsValues)-2)
-                    ->append(")'; ");
+        $oFieldsWhere->subString(0, strlen($oFieldsWhere)-4);
 
         return [
-            'sFieldsInsert' => $sFieldsInsert,
-            'sFieldsValues' => $sFieldsValues,
-            'sFieldsBind'   => $sFieldsBind,
-            'sFieldsGet'    => $sFieldsGet
+            'oFieldsWhere' => $oFieldsWhere,
+            'oFieldsBind'  => $oFieldsBind,
+            'oFieldsGet'   => $oFieldsGet
         ];
     }
 
     /**
      * Método responsável por gerar o método dao insert
      */
-    private function generateDaoInsert($sNomeTabela, $aFields)
+    private function generateDaoInserir($sName, $aFields)
     {
         $oBody = new StringBuilder();
         $oBody->appendNL("try {")
             ->appendNL("\$sql = 'INSERT INTO' . self::NOME_TABELA")
-            ->appendNL($aFields['sFieldsInsert'])
-            ->appendNL($aFields['sFieldsValues'])
+            ->appendNL($aFields['oFieldsInsert'])
+            ->appendNL($aFields['oFieldsValues'])
             ->appendNL("\$pdo = Conexao::conectar();")
             ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
-            ->appendNL($aFields['sFieldsBind'])
-            ->appendNL($aFields['sFieldsGet'])
+            ->appendNL($aFields['oFieldsBind'])
+            ->appendNL($aFields['oFieldsGet'])
             ->appendNL("return \$stmt->execute();")
             ->appendNL("} catch (PDOException \$e) {")
             ->appendNL("echo 'Erro ao Inserir -> ' . \$e->getMessage();")
@@ -112,49 +107,41 @@ class GenerateModelDao
             ->appendNL("\$pdo = null;")
             ->append("}");
 
-        return Helpers::createMethod('insert', "\$".$sNomeTabela, $oBody);
+        return Helpers::createMethod('inserir', "\$".$sName, $oBody);
     }
 
     /**
      * Método responsável por gerar o método dao update
      */
-    private function generateDaoUpdate($sNomeTabela, $aFields)
+    private function generateDaoAtualizar($sName, $aFields)
     {
         $oBody = new StringBuilder();
 
-        return Helpers::createMethod('update', "\$".$sNomeTabela, $oBody);
+        return Helpers::createMethod('atualizar', "\$".$sName, $oBody);
     }
 
     /**
      * Método responsável por gerar o método dao delete
      */
-    private function generateDaoDelete($sNomeTabela, $aChavesPrimarias)
+    private function generateDaoDeletar($sName, $sFieldsPrimaryKey)
     {
         $oBody = new StringBuilder();
 
         $oBody->appendNL("try {")
             ->appendNL("\$pdo = Conexao::conectar();")
-            ->append("\$sql = 'DELETE FROM ' . self::NOME_TABELA . ' WHERE ");
-
-        foreach ($aChavesPrimarias as $chave)
-            $oBody->append($chave . " = :" . $chave . " AND ");
-        $oBody->subString(0, strlen($oBody)-4)
+            ->append("\$sql = 'DELETE FROM ' . self::NOME_TABELA . ' WHERE ")
+            ->append($sFieldsPrimaryKey['oFieldsWhere'])
             ->appendNL("';")
-            ->appendNL("\$stmt = \$pdo->prepare(\$sql);");
-        
-        foreach ($aChavesPrimarias as $chave)
-            $oBody->appendNL("\$stmt->bindParam(':" . $chave . "', \$" . $chave . ");");
-        
-        foreach ($aChavesPrimarias as $chave)
-            $oBody->appendNL("\$" . $chave . " = \$" . $sNomeTabela . "->get" . ucfirst($chave) . "();");
-        
-        $oBody->appendNL("\nreturn \$stmt->execute();")
+            ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
+            ->append($sFieldsPrimaryKey['oFieldsBind'])
+            ->append($sFieldsPrimaryKey['oFieldsGet'])
+            ->appendNL("\nreturn \$stmt->execute();")
             ->appendNL("} catch (PDOException \$e) {")
             ->appendNL("echo 'Erro ao Excluir -> ' . \$e->getMessage();")
             ->appendNL("} finally {")
             ->appendNL("\$pdo = null;")
             ->append("}");
 
-        return Helpers::createMethod('delete', "\$".$sNomeTabela, $oBody);
+        return Helpers::createMethod('deletar', "\$".$sName, $oBody);
     }
 }
