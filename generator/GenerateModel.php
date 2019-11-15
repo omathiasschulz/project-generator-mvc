@@ -14,9 +14,10 @@ class GenerateModel
     {
         foreach ($aTabelas as $oTabela) {
             // Remove a primeira posição do array, que são as chaves primárias
-            array_shift($oTabela->atributos);
+            $oChavesPrimarias = array_shift($oTabela->atributos);
+            $aChavesPrimarias = $oChavesPrimarias->chaves_primarias;
             self::generateDto($oTabela->nome, $oTabela->atributos);
-            self::generateDao($oTabela->nome, $oTabela->atributos);
+            self::generateDao($oTabela->nome, $oTabela->atributos, $aChavesPrimarias);
         }
     }
 
@@ -92,13 +93,15 @@ class GenerateModel
     /**
      * Método responsável por gerar as classes dao de cada tabela
      */
-    private function generateDao($sNomeTabela, $aAtributos)
+    private function generateDao($sNomeTabela, $aAtributos, $aChavesPrimarias)
     {
         $aFields = self::generateDaoFields($sNomeTabela, $aAtributos);
 
         $oBody = new StringBuilder();
         $oBody->appendNL("const NOME_TABELA = '" . $sNomeTabela . "';")
-            ->append(self::generateDaoInsert($sNomeTabela, $aAtributos, $aFields));
+            ->append(self::generateDaoInsert($sNomeTabela, $aFields))
+            ->append(self::generateDaoUpdate($sNomeTabela, $aFields))
+            ->append(self::generateDaoDelete($sNomeTabela, $aChavesPrimarias));
         
         Helpers::createClass(
             ucfirst($sNomeTabela . "DAO"),
@@ -143,7 +146,10 @@ class GenerateModel
         ];
     }
 
-    private function generateDaoInsert($sNomeTabela, $aAtributos, $aFields)
+    /**
+     * Método responsável por gerar o método dao insert
+     */
+    private function generateDaoInsert($sNomeTabela, $aFields)
     {
         $oBody = new StringBuilder();
         $oBody->appendNL("try {")
@@ -162,5 +168,48 @@ class GenerateModel
             ->append("}");
 
         return Helpers::createMethod('insert', "\$".$sNomeTabela, $oBody);
+    }
+
+    /**
+     * Método responsável por gerar o método dao update
+     */
+    private function generateDaoUpdate($sNomeTabela, $aFields)
+    {
+        $oBody = new StringBuilder();
+
+        return Helpers::createMethod('update', "\$".$sNomeTabela, $oBody);
+    }
+
+    /**
+     * Método responsável por gerar o método dao delete
+     */
+    private function generateDaoDelete($sNomeTabela, $aChavesPrimarias)
+    {
+        $oBody = new StringBuilder();
+
+        $oBody->appendNL("try {")
+            ->appendNL("\$pdo = Conexao::conectar();")
+            ->append("\$sql = 'DELETE FROM ' . self::NOME_TABELA . ' WHERE ");
+
+        foreach ($aChavesPrimarias as $chave)
+            $oBody->append($chave . " = :" . $chave . " AND ");
+        $oBody->subString(0, strlen($oBody)-4)
+            ->appendNL("';")
+            ->appendNL("\$stmt = \$pdo->prepare(\$sql);");
+        
+        foreach ($aChavesPrimarias as $chave)
+            $oBody->appendNL("\$stmt->bindParam(':" . $chave . "', \$" . $chave . ");");
+        
+        foreach ($aChavesPrimarias as $chave)
+            $oBody->appendNL("\$" . $chave . " = \$" . $sNomeTabela . "->get" . ucfirst($chave) . "();");
+        
+        $oBody->appendNL("\nreturn \$stmt->execute();")
+            ->appendNL("} catch (PDOException \$e) {")
+            ->appendNL("echo 'Erro ao Excluir -> ' . \$e->getMessage();")
+            ->appendNL("} finally {")
+            ->appendNL("\$pdo = null;")
+            ->append("}");
+
+        return Helpers::createMethod('delete', "\$".$sNomeTabela, $oBody);
     }
 }
