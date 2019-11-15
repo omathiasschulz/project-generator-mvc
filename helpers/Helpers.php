@@ -47,7 +47,8 @@ class Helpers
         $sPath, 
         $aComposerUses = null,
         $sExtendClass = null, 
-        $sImplementClass = null
+        $sImplementClass = null,
+        $sType = "class"
     ) {
         $namespace = str_replace("/", "\\", substr($sPath, 0, strlen($sPath) - 1));
         
@@ -60,7 +61,7 @@ class Helpers
                 $class->appendNL("use " . $use . ";");
             }
         }
-        $class->append("\nclass " . $sName);
+        $class->append("\n" . $sType ." " . $sName);
         if (!is_null($sExtendClass)) {
             $class->append(" extends " . $sExtendClass);
         }

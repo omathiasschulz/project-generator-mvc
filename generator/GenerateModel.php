@@ -14,12 +14,38 @@ class GenerateModel
      */
     public function create($aTabelas)
     {
+        self::generateGenericInterface();
+        
         foreach ($aTabelas as $oTabela) {
             // Remove a primeira posição do array, que são as chaves primárias
             $oChavesPrimarias = array_shift($oTabela->atributos);
             $aChavesPrimarias = $oChavesPrimarias->chaves_primarias;
             GenerateModelDto::create($oTabela->nome, $oTabela->atributos);
             GenerateModelDao::create($oTabela->nome, $oTabela->atributos, $aChavesPrimarias);
+            GenerateModelBo::create($oTabela->nome);
         }
+    }
+
+    /**
+     * Método responsável por gerar a interface genérica
+     */
+    private function generateGenericInterface()
+    {
+        $oBody = new StringBuilder();
+        $oBody->appendNL("public function inserir(\$object);")
+            ->appendNL("public function atualizar(\$object);")
+            ->appendNL("public function deletar(\$object);")
+            ->appendNL("public function buscarUm(\$object);")
+            ->appendNL("public function buscarTodos();");
+
+        Helpers::createClass(
+            "IGeneric",
+            $oBody,
+            "app/model/interfaces/",
+            null,
+            null,
+            null,
+            "interface"
+        );
     }
 }

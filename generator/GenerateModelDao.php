@@ -30,11 +30,11 @@ class GenerateModelDao
             [
                 "app\\model\\dto\\".ucfirst($sTableName),
                 "app\conexao\\Conexao",
-                "app\\model\\interfaces\\IGenericDB",
+                "app\\model\\interfaces\\IGeneric",
                 "PDO"
             ],
             null,
-            "IGenericDB"
+            "IGeneric"
         );
     }
 
@@ -92,7 +92,7 @@ class GenerateModelDao
     }
 
     /**
-     * Método responsável por gerar o método dao insert
+     * Método responsável por gerar o método dao inserir
      */
     private function generateDaoInserir($sName, $aFields)
     {
@@ -116,7 +116,7 @@ class GenerateModelDao
     }
 
     /**
-     * Método responsável por gerar o método dao update
+     * Método responsável por gerar o método dao atualizar
      */
     private function generateDaoAtualizar($sName, $aFields)
     {
@@ -126,7 +126,7 @@ class GenerateModelDao
     }
 
     /**
-     * Método responsável por gerar o método dao delete
+     * Método responsável por gerar o método dao deletar
      */
     private function generateDaoDeletar($sName, $sFieldsPrimaryKey)
     {
@@ -182,7 +182,7 @@ class GenerateModelDao
     }
 
     /**
-     * Método responsável por gerar o método dao delete
+     * Método responsável por gerar o método dao buscar todos
      */
     private function generateDaoBuscarTodos($sName, $sFieldsSet)
     {
