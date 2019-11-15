@@ -12,16 +12,16 @@ class GenerateModelDao
      */
     public function create($sTableName, $aTableAttributes, $aTablePrimaryKeys)
     {
-        $aFields = self::generateDaoFields($sTableName, $aTableAttributes, $aTablePrimaryKeys);
+        $aFieldsNotPK = self::generateDaoFieldsNotPrimaryKey($sTableName, $aTableAttributes, $aTablePrimaryKeys);
         $aFieldsPK = self::generateDaoFieldsPrimaryKey($sTableName, $aTablePrimaryKeys);
 
         $oBody = new StringBuilder();
         $oBody->appendNL("const NOME_TABELA = '" . $sTableName . "';")
-            ->append(self::generateDaoInserir($sTableName, $aFields))
-            ->append(self::generateDaoAtualizar($sTableName, $aFields, $aFieldsPK))
+            ->append(self::generateDaoInserir($sTableName, $aFieldsNotPK))
+            ->append(self::generateDaoAtualizar($sTableName, $aFieldsNotPK, $aFieldsPK))
             ->append(self::generateDaoDeletar($sTableName, $aFieldsPK))
-            ->append(self::generateDaoBuscarUm($sTableName, $aFields['oFieldsSet'], $aFieldsPK))
-            ->append(self::generateDaoBuscarTodos($sTableName, $aFields['oFieldsSet'], $aFieldsPK['oFieldsSet']));
+            ->append(self::generateDaoBuscarUm($sTableName, $aFieldsNotPK['oFieldsSet'], $aFieldsPK))
+            ->append(self::generateDaoBuscarTodos($sTableName, $aFieldsNotPK['oFieldsSet'], $aFieldsPK['oFieldsSet']));
         
         Helpers::createClass(
             ucfirst($sTableName . "DAO"),
@@ -39,9 +39,9 @@ class GenerateModelDao
     }
 
     /**
-     * Método responsável por gerar as strins dos respectivos campos
+     * Método responsável por gerar as strins dos campos que não são chaves primárias
      */
-    private function generateDaoFields($sName, $aAttributes, $aPrimaryKeys)
+    private function generateDaoFieldsNotPrimaryKey($sName, $aAttributes, $aPrimaryKeys)
     {
         $oFieldsInsert = new StringBuilder(); // Campos do sql insert
         $oFieldsInsertValues = new StringBuilder(); // Campos do sql insert values
@@ -60,19 +60,10 @@ class GenerateModelDao
                 $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(\$linha['" . $oAttribute->nome . "'])");
                 
             }
-            // $oFieldsSqlInsertValues->append(":" . $oAttribute->nome . ", ");
         }
         $oFieldsInsert->subString(0, strlen($oFieldsInsert)-2);
         $oFieldsInsertValues->subString(0, strlen($oFieldsInsertValues)-2);
         $oFieldsUpdate->subString(0, strlen($oFieldsUpdate)-2);
-
-
-        // $oFieldsSqlInsert->subString(0, strlen($oFieldsSqlInsert)-2)
-        //             ->append(")' ");
-        // $oFieldsSqlUpdateSet->subString(0, strlen($oFieldsSqlUpdateSet)-2)
-        //             ->append(" '\n");
-        // $oFieldsSqlInsertValues->subString(0, strlen($oFieldsSqlInsertValues)-2)
-        //             ->append(")'; ");
 
         return [
             'oFieldsInsert'       => $oFieldsInsert,
@@ -85,14 +76,15 @@ class GenerateModelDao
     }
 
     /**
-     * Método responsável por gerar as strins das chaves primárias
+     * Método responsável por gerar as strins dos campos que são chaves primárias
      */
     private function generateDaoFieldsPrimaryKey($sName, $aPrimaryKeys)
     {
-        $oFieldsWhere = new StringBuilder();
-        $oFieldsBind = new StringBuilder();
-        $oFieldsGet = new StringBuilder();
-        $oFieldsSet = new StringBuilder();
+        $oFieldsWhere = new StringBuilder(); // Campos do sql update where
+        $oFieldsBind = new StringBuilder(); // Campos do bind pdo
+        $oFieldsGet = new StringBuilder(); // Campos do get pdo
+        $oFieldsSet = new StringBuilder(); // Campos do set pdo
+
         foreach ($aPrimaryKeys as $sPrimaryKey) {
             $oFieldsWhere->append($sPrimaryKey . " = :" . $sPrimaryKey . " AND ");
             $oFieldsBind->appendNL("\$stmt->bindParam(':" . $sPrimaryKey . "', \$" . $sPrimaryKey . ");");
@@ -112,18 +104,18 @@ class GenerateModelDao
     /**
      * Método responsável por gerar o método dao inserir
      */
-    private function generateDaoInserir($sName, $aFields)
+    private function generateDaoInserir($sName, $aFieldsNotPK)
     {
         $oBody = new StringBuilder();
         $oBody->appendNL("try {")
             ->append("\$sql = 'INSERT INTO ' . self::NOME_TABELA")
-            ->appendNL(" . ' (" . $aFields['oFieldsInsert'] . ")'")
+            ->appendNL(" . ' (" . $aFieldsNotPK['oFieldsInsert'] . ")'")
             ->append(" . ' VALUES")
-            ->appendNL(" (" . $aFields['oFieldsInsertValues'] . ")';")
+            ->appendNL(" (" . $aFieldsNotPK['oFieldsInsertValues'] . ")';")
             ->appendNL("\$pdo = Conexao::conectar();")
             ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
-            ->appendNL($aFields['oFieldsBind'])
-            ->appendNL($aFields['oFieldsGet'])
+            ->appendNL($aFieldsNotPK['oFieldsBind'])
+            ->appendNL($aFieldsNotPK['oFieldsGet'])
             ->appendNL("return \$stmt->execute();")
             ->appendNL("} catch (PDOException \$e) {")
             ->appendNL("echo 'Erro ao Inserir -> ' . \$e->getMessage();")
@@ -137,19 +129,19 @@ class GenerateModelDao
     /**
      * Método responsável por gerar o método dao atualizar
      */
-    private function generateDaoAtualizar($sName, $aFields, $aFieldsPK)
+    private function generateDaoAtualizar($sName, $aFieldsNotPK, $aFieldsPK)
     {
         $oBody = new StringBuilder();
         $oBody->appendNL("try {")
             ->appendNL("\$sql = 'UPDATE ' . self::NOME_TABELA")
-            ->appendNL(" . ' SET " . $aFields['oFieldsUpdate'] . "'")
+            ->appendNL(" . ' SET " . $aFieldsNotPK['oFieldsUpdate'] . "'")
             ->appendNL(" . ' WHERE " . $aFieldsPK['oFieldsWhere'] . "';")
             ->appendNL("\$pdo = Conexao::conectar();")
             ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
             ->append($aFieldsPK['oFieldsBind'])
-            ->appendNL($aFields['oFieldsBind'])
+            ->appendNL($aFieldsNotPK['oFieldsBind'])
             ->append($aFieldsPK['oFieldsGet'])
-            ->appendNL($aFields['oFieldsGet'])
+            ->appendNL($aFieldsNotPK['oFieldsGet'])
             ->appendNL("return \$stmt->execute();")
             ->appendNL("} catch (PDOException \$e) {")
             ->appendNL("echo 'Erro ao Atualizar -> ' . \$e->getMessage();")
@@ -215,7 +207,7 @@ class GenerateModelDao
     /**
      * Método responsável por gerar o método dao buscar todos
      */
-    private function generateDaoBuscarTodos($sName, $sFieldsSet, $sFieldsSetPK)
+    private function generateDaoBuscarTodos($sName, $sFieldsSetNotPK, $sFieldsSetPK)
     {
         $oBody = new StringBuilder();
 
@@ -227,7 +219,7 @@ class GenerateModelDao
             ->appendNL("\$result = [];")
             ->appendNL("while (\$linha = \$stmt->fetch(PDO::FETCH_ASSOC)) {")
             ->appendNL("\$result[] = (new " . ucfirst($sName) . "())")
-            ->append($sFieldsSetPK . $sFieldsSet)
+            ->append($sFieldsSetPK . $sFieldsSetNotPK)
             ->appendNL(";\n}")
             ->appendNL("return \$result;")
             ->appendNL("} catch (PDOException \$e) {")
