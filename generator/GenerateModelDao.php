@@ -19,7 +19,9 @@ class GenerateModelDao
         $oBody->appendNL("const NOME_TABELA = '" . $sTableName . "';")
             ->append(self::generateDaoInserir($sTableName, $aFields))
             ->append(self::generateDaoAtualizar($sTableName, $aFields))
-            ->append(self::generateDaoDeletar($sTableName, $sFieldsPrimaryKey));
+            ->append(self::generateDaoDeletar($sTableName, $sFieldsPrimaryKey))
+            ->append(self::generateDaoBuscarUm($sTableName, $aFields['oFieldsSet'], $sFieldsPrimaryKey))
+            ->append(self::generateDaoBuscarTodos($sTableName, $aFields['oFieldsSet']));
         
         Helpers::createClass(
             ucfirst($sTableName . "DAO"),
@@ -45,11 +47,13 @@ class GenerateModelDao
         $oFieldsValues = new StringBuilder(" . 'VALUES (");
         $oFieldsBind = new StringBuilder();
         $oFieldsGet = new StringBuilder();
+        $oFieldsSet = new StringBuilder();
         foreach ($aAttributes as $oAttribute) {
             $oFieldsInsert->append($oAttribute->nome . ", ");
             $oFieldsValues->append(":" . $oAttribute->nome . ", ");
             $oFieldsBind->appendNL("\$stmt->bindParam(':" . $oAttribute->nome . "', \$" . $oAttribute->nome . ", PDO::PARAM_STR);");
             $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "();");
+            $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(\$linha[" . $oAttribute->nome . "])");
         }
         $oFieldsInsert->subString(0, strlen($oFieldsInsert)-2)
                     ->append(")' ");
@@ -60,7 +64,8 @@ class GenerateModelDao
             'oFieldsInsert' => $oFieldsInsert,
             'oFieldsValues' => $oFieldsValues,
             'oFieldsBind'   => $oFieldsBind,
-            'oFieldsGet'    => $oFieldsGet
+            'oFieldsGet'    => $oFieldsGet,
+            'oFieldsSet'    => $oFieldsSet
         ];
     }
 
@@ -143,5 +148,63 @@ class GenerateModelDao
             ->append("}");
 
         return Helpers::createMethod('deletar', "\$".$sName, $oBody);
+    }
+
+    /**
+     * Método responsável por gerar o método dao buscar um
+     */
+    private function generateDaoBuscarUm($sName, $sFieldsSet, $sFieldsPrimaryKey)
+    {
+        $oBody = new StringBuilder();
+
+        $oBody->appendNL("try {")
+            ->appendNL("\$pdo = Conexao::conectar();")
+            ->append("\$sql = 'SELECT * FROM ' . self::NOME_TABELA . ' WHERE ")
+            ->append($sFieldsPrimaryKey['oFieldsWhere'])
+            ->appendNL("';")
+            ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
+            ->append($sFieldsPrimaryKey['oFieldsBind'])
+            ->appendNL($sFieldsPrimaryKey['oFieldsGet'])
+            ->appendNL("\$stmt->execute();")
+            ->appendNL("\$result = [];")
+            ->appendNL("while (\$linha = \$stmt->fetch(PDO::FETCH_ASSOC)) {")
+            ->appendNL("\$result[] = (new " . ucfirst($sName) . "())")
+            ->append($sFieldsSet)
+            ->appendNL(";\n}")
+            ->appendNL("return \$result;")
+            ->appendNL("} catch (PDOException \$e) {")
+            ->appendNL("echo 'Erro ao Buscar um -> ' . \$e->getMessage();")
+            ->appendNL("} finally {")
+            ->appendNL("\$pdo = null;")
+            ->append("}");
+
+        return Helpers::createMethod('buscarUm', "\$".$sName, $oBody);
+    }
+
+    /**
+     * Método responsável por gerar o método dao delete
+     */
+    private function generateDaoBuscarTodos($sName, $sFieldsSet)
+    {
+        $oBody = new StringBuilder();
+
+        $oBody->appendNL("try {")
+            ->appendNL("\$pdo = Conexao::conectar();")
+            ->appendNL("\$sql = 'SELECT * FROM ' . self::NOME_TABELA;")
+            ->appendNL("\$stmt = \$pdo->prepare(\$sql);\n")
+            ->appendNL("\$stmt->execute();")
+            ->appendNL("\$result = [];")
+            ->appendNL("while (\$linha = \$stmt->fetch(PDO::FETCH_ASSOC)) {")
+            ->appendNL("\$result[] = (new " . ucfirst($sName) . "())")
+            ->append($sFieldsSet)
+            ->appendNL(";\n}")
+            ->appendNL("return \$result;")
+            ->appendNL("} catch (PDOException \$e) {")
+            ->appendNL("echo 'Erro ao Buscar todos -> ' . \$e->getMessage();")
+            ->appendNL("} finally {")
+            ->appendNL("\$pdo = null;")
+            ->append("}");
+
+        return Helpers::createMethod('buscarTodos', null, $oBody);
     }
 }
