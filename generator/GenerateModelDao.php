@@ -112,7 +112,7 @@ class GenerateModelDao
             ->appendNL(" . ' (" . $aFieldsNotPK['oFieldsInsert'] . ")'")
             ->append(" . ' VALUES")
             ->appendNL(" (" . $aFieldsNotPK['oFieldsInsertValues'] . ")';")
-            ->appendNL("\$pdo = Conexao::conectar();")
+            ->appendNL("\$pdo = Conexao::startConnection();")
             ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
             ->appendNL($aFieldsNotPK['oFieldsBind'])
             ->appendNL($aFieldsNotPK['oFieldsGet'])
@@ -136,7 +136,7 @@ class GenerateModelDao
             ->appendNL("\$sql = 'UPDATE ' . self::NOME_TABELA")
             ->appendNL(" . ' SET " . $aFieldsNotPK['oFieldsUpdate'] . "'")
             ->appendNL(" . ' WHERE " . $aFieldsPK['oFieldsWhere'] . "';")
-            ->appendNL("\$pdo = Conexao::conectar();")
+            ->appendNL("\$pdo = Conexao::startConnection();")
             ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
             ->append($aFieldsPK['oFieldsBind'])
             ->appendNL($aFieldsNotPK['oFieldsBind'])
@@ -160,7 +160,7 @@ class GenerateModelDao
         $oBody = new StringBuilder();
 
         $oBody->appendNL("try {")
-            ->appendNL("\$pdo = Conexao::conectar();")
+            ->appendNL("\$pdo = Conexao::startConnection();")
             ->appendNL("\$sql = 'DELETE FROM ' . self::NOME_TABELA")
             ->appendNL(" . ' WHERE " . $aFieldsPK['oFieldsWhere'] . "';")
             ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
@@ -184,13 +184,14 @@ class GenerateModelDao
         $oBody = new StringBuilder();
 
         $oBody->appendNL("try {")
-            ->appendNL("\$pdo = Conexao::conectar();")
+            ->appendNL("\$pdo = Conexao::startConnection();")
             ->appendNL("\$sql = 'SELECT * FROM ' . self::NOME_TABELA")
             ->appendNL(" . ' WHERE " . $aFieldsPK['oFieldsWhere'] . "';")
             ->appendNL("\$stmt = \$pdo->prepare(\$sql);")
             ->appendNL($aFieldsPK['oFieldsBind'])
             ->appendNL($aFieldsPK['oFieldsGet'])
             ->appendNL("\$stmt->execute();")
+            ->appendNL("\$result = '';")
             ->appendNL("while (\$linha = \$stmt->fetch(PDO::FETCH_ASSOC)) {")
             ->appendNL("\$result = (new " . ucfirst($sName) . "())")
             ->appendNL($aFieldsPK['oFieldsSet'] . $sFieldsSet . ";\n}")
@@ -212,7 +213,7 @@ class GenerateModelDao
         $oBody = new StringBuilder();
 
         $oBody->appendNL("try {")
-            ->appendNL("\$pdo = Conexao::conectar();")
+            ->appendNL("\$pdo = Conexao::startConnection();")
             ->appendNL("\$sql = 'SELECT * FROM ' . self::NOME_TABELA;")
             ->appendNL("\$stmt = \$pdo->prepare(\$sql);\n")
             ->appendNL("\$stmt->execute();")
