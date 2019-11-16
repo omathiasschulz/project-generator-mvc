@@ -1,6 +1,8 @@
 
 create database transportadora;
 
+use transportadora;
+
 create table produto (
     codigo int not null auto_increment,
     descricao varchar(100) not null,

@@ -20,11 +20,17 @@ class SQLExtractor
     {
         $sSql = self::getSQLFromFile($sSqlName);
 
+        // Busca o nome do database
         $aDatabaseName = self::getDatabaseName($sSql);
         if (!$aDatabaseName[0])
             return json_encode($aDatabaseName);
         $sSql = self::splitToTheSemicolon($sSql);
 
+        // Verifica se possui o script use nome_database
+        if (self::getUse($sSql))
+            $sSql = self::splitToTheSemicolon($sSql);
+
+        // Busca as tabelas e atributos do database
         $aTables = self::getTables($sSql);
         if (!$aTables[0])
             return json_encode($aTables);
@@ -58,6 +64,16 @@ class SQLExtractor
         return isset($aMatches[1][0]) 
             ? [true, $aMatches[1][0]] 
             : [false, 'Erro ao buscar o nome do Database'];
+    }
+
+    /**
+     * Método responsável por verificar se o sql possui o script use nome do database
+     */
+    private function getUse($sSql)
+    {
+        $sPattern = "/(?i)^[[:space:]]*use[[:space:]]+[a-zA-Z0-9]\w+[[:space:]]*;/";
+        preg_match_all($sPattern, $sSql, $aMatches);
+        return isset($aMatches[0][0]) ? true : false;
     }
 
     /**
