@@ -21,6 +21,7 @@ class Generate
         $aDatabase = $aSQL[1];
 
         GenerateRoutes::create($aDatabase->tabelas);
+        GenerateConexao::create($aDatabase->nome);
         GenerateController::create($aDatabase->tabelas);
         GenerateModel::create($aDatabase->tabelas);
 

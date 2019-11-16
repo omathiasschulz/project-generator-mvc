@@ -15,9 +15,9 @@ class GenerateModelBo
         $classDAO = ucfirst($sTableName . "DAO");
 
         $oBody = new StringBuilder();
-        $oBody->appendNL("private \$" . $classDAO . ";\n")
+        $oBody->appendNL("private \$" . $sTableName . "DAO" . ";\n")
             ->appendNL("public function __construct(IGeneric \$" . $classDAO . "){")
-            ->appendNL("\$this->" . $classDAO . " = \$" . $classDAO . ";")
+            ->appendNL("\$this->" . $sTableName . "DAO" . " = \$" . $classDAO . ";")
             ->appendNL("}")
             ->append(self::generateBOInserir($sTableName))
             ->append(self::generateBOAtualizar($sTableName))
@@ -46,7 +46,7 @@ class GenerateModelBo
         $oBody = new StringBuilder();
         $oBody->append("return \$this->" . $sName . "DAO->inserir(\$" . $sName . ");");
 
-        return Helpers::createMethod('inserir', ucfirst($sName)." \$".$sName, $oBody);
+        return Helpers::createMethod('inserir', "\$".$sName, $oBody);
     }
 
     /**
@@ -57,7 +57,7 @@ class GenerateModelBo
         $oBody = new StringBuilder();
         $oBody->append("return \$this->" . $sName . "DAO->atualizar(\$" . $sName . ");");
 
-        return Helpers::createMethod('atualizar', ucfirst($sName)." \$".$sName, $oBody);
+        return Helpers::createMethod('atualizar', "\$".$sName, $oBody);
     }
 
     /**
@@ -68,7 +68,7 @@ class GenerateModelBo
         $oBody = new StringBuilder();
         $oBody->append("return \$this->" . $sName . "DAO->deletar(\$" . $sName . ");");
 
-        return Helpers::createMethod('deletar', ucfirst($sName)." \$".$sName, $oBody);
+        return Helpers::createMethod('deletar', "\$".$sName, $oBody);
     }
 
     /**
@@ -79,7 +79,7 @@ class GenerateModelBo
         $oBody = new StringBuilder();
         $oBody->append("return \$this->" . $sName . "DAO->buscarUm(\$" . $sName . ");");
 
-        return Helpers::createMethod('buscarUm', ucfirst($sName)." \$".$sName, $oBody);
+        return Helpers::createMethod('buscarUm', "\$".$sName, $oBody);
     }
 
     /**

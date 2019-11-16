@@ -1,25 +1,10 @@
 
-create database escola;
+create database transportadora;
 
-create table professor (
-    id int not null,
-    codigo int not null,
-    nome varchar(100) not null,
-    rg varchar(11),
-    cpf varchar(11),
-    variavel decimal,
-    variavel2 decimal(3),
-    variavel3 decimal(3,3),
-    dataNasc date,
-    primary key(id, codigo, nome)
-);
-
-create table aluno (
-     id  int not null,
-    codigo int not null,
-    nome varchar(100) not null,
-    rg varchar(11),
-    cpf varchar(11),
-    dataNasc date,
-    primary key(id, codigo)
+create table produto (
+    codigo int not null auto_increment,
+    descricao varchar(100) not null,
+    valor decimal not null,
+    peso float,
+    primary key(codigo)
 );

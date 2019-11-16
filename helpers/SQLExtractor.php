@@ -89,7 +89,7 @@ class SQLExtractor
             ];
 
             // Remove a tabela atual do SQL
-            $sSql = self::splitToTheSemicolon($sSql);
+            $sSql = trim(self::splitToTheSemicolon($sSql));
         }
 
         return [true, $aFormattedTables];

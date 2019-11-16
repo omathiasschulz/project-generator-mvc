@@ -1,54 +1,64 @@
 <?php
 
 namespace generator;
-// require_once('Helpers.php');
+
+use helpers\Helpers;
+use helpers\StringBuilder;
 
 class GenerateConexao
 {
     /**
-     * Método responsável por gerar a conexao
+     * Método responsável por gerar a classe de conexao com o banco de dados
      */
-    public static function create($pdo)
-    {
-        $conexao = self::getConexao($pdo);
-        Helpers::createFolder('app/conexao');
-        Helpers::writeFile('app/conexao/Conexao.php', $conexao);
+    public static function create
+    (
+        $dbName,
+        $dbType = "mysql", 
+        $dbHost = "127.0.0.1",
+        $dbUser = "root",
+        $dbPassword = ""
+    ) {
+        $oBody = self::getConexao($dbName, $dbType, $dbHost, $dbUser, $dbPassword);
+
+        Helpers::createClass(
+            "Conexao",
+            $oBody,
+            "app/conexao/",
+            ["PDO"]
+        );
     }
 
     /**
-     * Método que gera a string que será gravada na Conexao.php
+     * Método que gera a string que será gravada na classe de conexão
      */
-    private function getConexao($pdo)
-    {
-        return 
-'<?php
-
-class Conexao {
-
-    private const DB_TYPE = "' . $pdo->driver . '";
-    private const DB_HOST = "' . $pdo->host . '";
-    private const DB_NAME = "' . $pdo->name . '";
-    private const DB_USER = "' . $pdo->user . '";
-    private const DB_PASSWORD = "' . $pdo->password . '";
-
-    // instance
-    private static $conexao;
-
-    // getInstance
-    public static function startConnection()
-    {
-        if (isset(self::$conexao))
-            return self::$conexao;
+    private function getConexao
+    (
+        $dbName, 
+        $dbType, 
+        $dbHost, 
+        $dbUser, 
+        $dbPassword
+    ) {
+        $oBody = new StringBuilder();
+        $oBody->appendNL("private const DB_TYPE = '" . $dbType . "';")
+            ->appendNL("private const DB_HOST = '" . $dbHost . "';")
+            ->appendNL("private const DB_NAME = '" . $dbName . "';")
+            ->appendNL("private const DB_USER = '" . $dbUser . "';")
+            ->appendNL("private const DB_PASSWORD = '" . $dbPassword . "';\n")
+            ->appendNL("private static \$conexao;\n")
+            ->appendNL("public static function startConnection()")
+            ->appendNL("{")
+            ->appendNL("if (isset(self::\$conexao))")
+            ->appendNL("\treturn self::\$conexao;\n")
+            ->appendNL("try {")
+            ->appendNL("self::\$conexao = new PDO(self::DB_TYPE . ':host=' . self::DB_HOST . ';dbname=' . self::DB_NAME, self::DB_USER, self::DB_PASSWORD);")
+            ->appendNL("self::\$conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);\n")
+            ->appendNL("return self::\$conexao;")
+            ->appendNL("} catch(PDOException \$e) {")
+            ->appendNL("return 'Error: ' . \$e->getMessage();")
+            ->appendNL("}")
+            ->appendNL("}");
         
-        try {
-            self::$conexao = new PDO(self::DB_TYPE . ":host=" . self::DB_HOST . ";dbname=" . self::DB_NAME, self::DB_USER, self::DB_PASSWORD);
-            self::$conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return self::$conexao;
-            
-        } catch(PDOException $e) {
-            return "Error: " . $e->getMessage();
-        }
-    }
-}';
+        return $oBody;
     }
 }
