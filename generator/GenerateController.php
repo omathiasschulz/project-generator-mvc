@@ -13,13 +13,23 @@ class GenerateController
     public function create($aTables)
     {
         foreach ($aTables as $oTable) {
-            $oBody = self::defaultMethods($oTable->nome);
+            // Remove a primeira posição do array, que são as chaves primárias
+            $aAttributes = $oTable->atributos;
+            $oPrimaryKeys = array_shift($aAttributes);
+            $aPrimaryKeys = $oPrimaryKeys->chaves_primarias;
+            $oBody = self::defaultMethods($oTable->nome, $aAttributes, $aPrimaryKeys);
 
             Helpers::createClass(
                 ucfirst($oTable->nome)."Controller", 
                 $oBody, 
                 'app/controller/',
-                ["core\\AbsController", "core\\Redirecionador"],
+                [
+                    "core\\AbsController", 
+                    "core\\Redirecionador",
+                    "app\\model\\dto\\".ucfirst($oTable->nome),
+                    "app\\model\\dao\\".ucfirst($oTable->nome)."DAO",
+                    "app\\model\\bo\\".ucfirst($oTable->nome)."BO",
+                ],
                 'AbsController'
             );
         }
@@ -28,15 +38,16 @@ class GenerateController
     /**
      * Método responsável por criar os métodos padrões de um controller
      */
-    private function defaultMethods($sName)
+    private function defaultMethods($sName, $aAttributes, $aPrimaryKeys)
     {
         $oBody = new StringBuilder();
         $oBody->append(self::defaultMethodCadastrar($sName))
-            ->append(self::defaultMethodInserir($sName))
+            ->append(self::defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys))
             ->append(self::defaultMethodVisualizar($sName))
             ->append(self::defaultMethodAtualizar($sName))
             ->append(self::defaultMethodDeletar($sName))
-            ->append(self::defaultMethodListar($sName));
+            ->append(self::defaultMethodListar($sName))
+            ;
         
         return $oBody;
     }
@@ -57,12 +68,23 @@ class GenerateController
      * Método responsável por gerar o método inserir
      * Inserir => Método responsável por inserir ou atualizar um registro do banco
      */
-    private function defaultMethodInserir($sName)
+    private function defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys)
     {
+        $oFieldsSet = new StringBuilder();
+        foreach ($aAttributes as $oAttribute)
+            if (!in_array($oAttribute->nome, $aPrimaryKeys)) 
+                $oFieldsSet->appendNL(
+                    "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? \$request->post->" . $oAttribute->nome . " : '')"
+                );
+        
         $oBody = new StringBuilder();
-        $oBody->append(
-            "// metodo inserir"
-        );
+        $oBody->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
+            ->appendNL("\$" . $sName . " = (new " . ucfirst($sName) . "())")
+            ->appendNL($oFieldsSet . ";")
+            ->appendNL("\$result = \$" . $sName . "BO->inserir(\$" . $sName . ");")
+            ->append("Redirecionador::paraARota('cadastrar?cadastrado=' . \$result);")
+        ;
+
         return Helpers::createMethod("inserir", "\$request", $oBody);
     }
 
