@@ -121,9 +121,15 @@ class GenerateController
     private function defaultMethodDeletar($sName)
     {
         $oBody = new StringBuilder();
-        $oBody->append(
-            "// metodo deletar"
-        );
+        $oBody->appendNL("\$" . $sName . "BO = new " . ucfirst($sName) . "BO(new " . ucfirst($sName) . "DAO());\n")
+            ->appendNL("\$result = \$" . $sName . "BO->buscarUm(\$id);")
+            ->appendNL("if (empty(\$result)) {")
+            ->appendNL("Redirecionador::paraARota('" . $sName . "/listar');")
+            ->appendNL("return;")
+            ->appendNL("}")
+            ->appendNL("\$this->view->" . $sName . " = \$result;")
+            ->appendNL("\$this->requisitarView('" . $sName . "/visualizar', 'baseHtml');");
+
         return Helpers::createMethod("deletar", "\$id", $oBody);
     }
     
@@ -134,9 +140,10 @@ class GenerateController
     private function defaultMethodListar($sName)
     {
         $oBody = new StringBuilder();
-        $oBody->append(
-            "// metodo listar"
-        );
+        $oBody->appendNL("\$" . $sName . "BO = new " . ucfirst($sName) . "BO(new " . ucfirst($sName) . "DAO());\n")
+            ->appendNL("\$this->view->many" . ucfirst($sName) . " = \$" . $sName . "BO->buscarTodos();\n")
+            ->appendNL("\$this->requisitarView('" . $sName . "/listar', 'baseHtml');");
+        
         return Helpers::createMethod("listar", null, $oBody);
     }
 }
