@@ -10,7 +10,7 @@ class GenerateModelDto
     /**
      * Método responsável por gerar a classe dto de uma tabela
      */
-    public function create($sTableName, $aTableAttributes)
+    public function create($sTableName, $aTableAttributes, $aTypesData)
     {
         $oBody = new StringBuilder();
         $oBody->append(self::generateDtoAttributes($aTableAttributes));
@@ -18,7 +18,7 @@ class GenerateModelDto
             $oBody->append(self::generateDtoGet($oAttribute->nome))
                 ->append(self::generateDtoSet($oAttribute->nome));
         }
-        $oBody->append(self::generateDtoToString($sTableName, $aTableAttributes));
+        $oBody->append(self::generateDtoToString($sTableName, $aTableAttributes, $aTypesData));
         
         Helpers::createClass(
             ucfirst($sTableName),
@@ -63,14 +63,20 @@ class GenerateModelDto
     /**
      * Método responsável por gerar o método __toString
      */
-    private function generateDtoToString($sName, $aAttributes)
+    private function generateDtoToString($sName, $aAttributes, $aTypesData)
     {
         $oBody = new StringBuilder();
         $oBody->appendNL("return '### " . ucfirst($sName) . " <'");
         foreach ($aAttributes as $oAttribute) {
-            $oBody->appendNL(
-                "\t. ' | " . $oAttribute->nome . " = ' . " . "\$this->get" . ucfirst($oAttribute->nome) . "()"
-            );
+            if (in_array($oAttribute->tipo, $aTypesData)) {
+                $oBody->appendNL(
+                    "\t. ' | " . $oAttribute->nome . " = ' . " . "\$this->get" . ucfirst($oAttribute->nome) . "()->format('Y-m-d H:i:s')"
+                );
+            } else {
+                $oBody->appendNL(
+                    "\t. ' | " . $oAttribute->nome . " = ' . " . "\$this->get" . ucfirst($oAttribute->nome) . "()"
+                );
+            }
         }
         $oBody->append("\t. ' | >';");
         return Helpers::createMethod('__toString', null, $oBody);

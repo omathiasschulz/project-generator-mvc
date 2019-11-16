@@ -12,7 +12,7 @@ class GenerateModel
     /**
      * Método responsável por gerar os models
      */
-    public function create($aTables)
+    public function create($aTables, $aTypesData)
     {
         self::generateGenericInterface();
         
@@ -21,8 +21,8 @@ class GenerateModel
             $aAttributes = $oTable->atributos;
             $oPrimaryKeys = array_shift($aAttributes);
             $aPrimaryKeys = $oPrimaryKeys->chaves_primarias;
-            GenerateModelDto::create($oTable->nome, $aAttributes);
-            GenerateModelDao::create($oTable->nome, $aAttributes, $aPrimaryKeys);
+            GenerateModelDto::create($oTable->nome, $aAttributes, $aTypesData);
+            GenerateModelDao::create($oTable->nome, $aAttributes, $aPrimaryKeys, $aTypesData);
             GenerateModelBo::create($oTable->nome);
         }
     }

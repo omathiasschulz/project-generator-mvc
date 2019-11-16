@@ -9,6 +9,7 @@ use helpers\SQLExtractor;
 class Generate
 {
     const SQL = 'sql.sql';
+    const TYPES_DATA = ['date', 'time', 'datetime', 'year'];
 
     /**
      * Método principal
@@ -23,7 +24,7 @@ class Generate
         GenerateRoutes::create($aDatabase->tabelas);
         GenerateConexao::create($aDatabase->nome);
         GenerateController::create($aDatabase->tabelas);
-        GenerateModel::create($aDatabase->tabelas);
+        GenerateModel::create($aDatabase->tabelas, self::TYPES_DATA);
 
         return [true, 'Projeto gerado com sucesso.'];
     }

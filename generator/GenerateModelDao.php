@@ -10,9 +10,14 @@ class GenerateModelDao
     /**
      * Método responsável por gerar a classe dao de uma tabela
      */
-    public function create($sTableName, $aTableAttributes, $aTablePrimaryKeys)
-    {
-        $aFieldsNotPK = self::generateDaoFieldsNotPrimaryKey($sTableName, $aTableAttributes, $aTablePrimaryKeys);
+    public function create
+    (
+        $sTableName, 
+        $aTableAttributes, 
+        $aTablePrimaryKeys, 
+        $aTypesData
+    ) {
+        $aFieldsNotPK = self::generateDaoFieldsNotPrimaryKey($sTableName, $aTableAttributes, $aTablePrimaryKeys, $aTypesData);
         $aFieldsPK = self::generateDaoFieldsPrimaryKey($sTableName, $aTablePrimaryKeys);
 
         $oBody = new StringBuilder();
@@ -31,7 +36,8 @@ class GenerateModelDao
                 "app\\model\\dto\\".ucfirst($sTableName),
                 "app\conexao\\Conexao",
                 "app\\model\\interfaces\\IGeneric",
-                "PDO"
+                "PDO",
+                "Datetime"
             ],
             null,
             "IGeneric"
@@ -41,8 +47,13 @@ class GenerateModelDao
     /**
      * Método responsável por gerar as strins dos campos que não são chaves primárias
      */
-    private function generateDaoFieldsNotPrimaryKey($sName, $aAttributes, $aPrimaryKeys)
-    {
+    private function generateDaoFieldsNotPrimaryKey
+    (
+        $sName, 
+        $aAttributes, 
+        $aPrimaryKeys, 
+        $aTypesData
+    ) {
         $oFieldsInsert = new StringBuilder(); // Campos do sql insert
         $oFieldsInsertValues = new StringBuilder(); // Campos do sql insert values
         $oFieldsBind = new StringBuilder(); // Campos do bind pdo
@@ -55,10 +66,16 @@ class GenerateModelDao
                 $oFieldsInsert->append($oAttribute->nome . ", ");
                 $oFieldsInsertValues->append(":" . $oAttribute->nome . ", ");
                 $oFieldsBind->appendNL("\$stmt->bindParam(':" . $oAttribute->nome . "', \$" . $oAttribute->nome . ", PDO::PARAM_STR);");
-                $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "();");
                 $oFieldsUpdate->append($oAttribute->nome . " = :" . $oAttribute->nome . ", ");
-                $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(\$linha['" . $oAttribute->nome . "'])");
                 
+                // Validação especial para o tipo data
+                if (in_array($oAttribute->tipo, $aTypesData)) {
+                    $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "()->format('Y-m-d H:i:s');");
+                    $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(new Datetime(\$linha['" . $oAttribute->nome . "']))");
+                } else {
+                    $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "();");
+                    $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(\$linha['" . $oAttribute->nome . "'])");
+                }
             }
         }
         $oFieldsInsert->subString(0, strlen($oFieldsInsert)-2);
