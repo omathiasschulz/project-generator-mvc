@@ -1,4 +1,8 @@
 {
+    "name": "projectGenerator/projectGenerator",
+    "description": "projectGenerator",
+    "type": "project",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "helpers\\": [
@@ -14,5 +18,8 @@
                 "app/"
             ]
         }
+    },
+    "require": {
+        "components/bootstrap": "4.3.*"
     }
 }

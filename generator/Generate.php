@@ -25,6 +25,7 @@ class Generate
         GenerateConexao::create($aDatabase->nome);
         GenerateController::create($aDatabase->tabelas);
         GenerateModel::create($aDatabase->tabelas, self::TYPES_DATA);
+        GenerateCore::create();
 
         return [true, 'Projeto gerado com sucesso.'];
     }
