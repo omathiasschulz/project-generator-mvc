@@ -12,7 +12,7 @@ class GenerateRoutes
     public static function create($aTabelas)
     {
         $routes = "<?php\n";
-        foreach ($aTabelas as $key => $oTabela) {
+        foreach ($aTabelas as $oTabela) {
             $routes .= self::defaultRoutes($oTabela->nome);
         }
         $routes .= "\nreturn \$route;\n";
@@ -27,11 +27,19 @@ class GenerateRoutes
     private function defaultRoutes($routeName)
     {
         $routes = ""
+            . "\n// Rota que leva a tela de cadastro um novo registro "
             . "\n\$route[] = ['/" . $routeName . "/cadastrar', '" . ucfirst($routeName) . "Controller@cadastrar'];"
+            . "\n// Rota que recebe o request com o registro e insere no banco "
             . "\n\$route[] = ['/" . $routeName . "/inserir', '" . ucfirst($routeName) . "Controller@inserir'];"
-            . "\n\$route[] = ['/" . $routeName . "/{id}/visualizar', '" . ucfirst($routeName) . "Controller@visualizar'];"
-            . "\n\$route[] = ['/" . $routeName . "/listar', '" . ucfirst($routeName) . "Controller@listar'];"
+            . "\n// Rota que leva a tela de alteração de um registro "
             . "\n\$route[] = ['/" . $routeName . "/{id}/atualizar', '" . ucfirst($routeName) . "Controller@atualizar'];"
+            . "\n// Rota que recebe o request com o registro e altera no banco "
+            . "\n\$route[] = ['/" . $routeName . "/alterar', '" . ucfirst($routeName) . "Controller@atualizar'];"
+            . "\n// Rota que leva a tela de visualização de um registro "
+            . "\n\$route[] = ['/" . $routeName . "/{id}/visualizar', '" . ucfirst($routeName) . "Controller@visualizar'];"
+            . "\n// Rota que leva a tela de visualização com todos os registros "
+            . "\n\$route[] = ['/" . $routeName . "/listar', '" . ucfirst($routeName) . "Controller@listar'];"
+            . "\n// Rota que recebe o id do registro e exclui do banco "
             . "\n\$route[] = ['/" . $routeName . "/{id}/deletar', '" . ucfirst($routeName) . "Controller@deletar'];\n";
         return $routes;
     }
