@@ -1,3 +1,4 @@
 app/
 core/
 vendor/
+composer.lock
