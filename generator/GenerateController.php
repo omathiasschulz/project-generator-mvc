@@ -43,10 +43,11 @@ class GenerateController
         $oBody = new StringBuilder();
         $oBody->append(self::defaultMethodCadastrar($sName))
             ->append(self::defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys))
-            ->append(self::defaultMethodVisualizar($sName))
             ->append(self::defaultMethodAtualizar($sName))
-            ->append(self::defaultMethodDeletar($sName))
+            ->append(self::defaultMethodAlterar($sName))
+            ->append(self::defaultMethodVisualizar($sName))
             ->append(self::defaultMethodListar($sName))
+            ->append(self::defaultMethodDeletar($sName))
             ;
         
         return $oBody;
@@ -54,7 +55,7 @@ class GenerateController
 
     /**
      * Método responsável por gerar o método cadastrar
-     * Cadastrar => Método responsável por levar para a tela de cadastro
+     * Cadastrar => Método responsável por levar a tela de cadastro um novo registro 
      */
     private function defaultMethodCadastrar($sName)
     {
@@ -66,7 +67,7 @@ class GenerateController
 
     /**
      * Método responsável por gerar o método inserir
-     * Inserir => Método responsável por inserir ou atualizar um registro do banco
+     * Inserir => Método responsável por receber o request com o registro e inserir no banco 
      */
     private function defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys)
     {
@@ -89,21 +90,8 @@ class GenerateController
     }
 
     /**
-     * Método responsável por gerar o método visualizar
-     * Visualizar => Método responsável por levar a tela de visualização de um registro
-     */
-    private function defaultMethodVisualizar($sName)
-    {
-        $oBody = new StringBuilder();
-        $oBody->append(
-            "// metodo visualizar"
-        );
-        return Helpers::createMethod("visualizar", "\$id", $oBody);
-    }
-    
-    /**
      * Método responsável por gerar o método atualizar
-     * Atualizar => Método responsável por levar a tela de atualização de um registro
+     * Atualizar => Método responsável por levar a tela de alteração de um registro 
      */
     private function defaultMethodAtualizar($sName)
     {
@@ -113,10 +101,50 @@ class GenerateController
         );
         return Helpers::createMethod("atualizar", "\$id", $oBody);
     }
+
+    /**
+     * Método responsável por gerar o método alterar
+     * Alterar => Método responsável por receber o request com o registro e alterar no banco 
+     */
+    private function defaultMethodAlterar($sName)
+    {
+        $oBody = new StringBuilder();
+        $oBody->append(
+            "// metodo alterar"
+        );
+        return Helpers::createMethod("alterar", "\$request", $oBody);
+    }
+
+    /**
+     * Método responsável por gerar o método visualizar
+     * Visualizar => Método responsável por levar a tela de visualização de um registro 
+     */
+    private function defaultMethodVisualizar($sName)
+    {
+        $oBody = new StringBuilder();
+        $oBody->append(
+            "// metodo visualizar"
+        );
+        return Helpers::createMethod("visualizar", "\$id", $oBody);
+    }
+
+    /**
+     * Método responsável por gerar o método listar
+     * Listar => Método responsável por levar a tela de visualização com todos os registros 
+     */
+    private function defaultMethodListar($sName)
+    {
+        $oBody = new StringBuilder();
+        $oBody->appendNL("\$" . $sName . "BO = new " . ucfirst($sName) . "BO(new " . ucfirst($sName) . "DAO());\n")
+            ->appendNL("\$this->view->many" . ucfirst($sName) . " = \$" . $sName . "BO->buscarTodos();\n")
+            ->appendNL("\$this->requisitarView('" . $sName . "/listar', 'baseHtml');");
+        
+        return Helpers::createMethod("listar", null, $oBody);
+    }
     
     /**
      * Método responsável por gerar o método deletar
-     * Deletar => Método responsável por deletar um registro
+     * Deletar => Método responsável por receber o id do registro e excluir do banco 
      */
     private function defaultMethodDeletar($sName)
     {
@@ -131,19 +159,5 @@ class GenerateController
             ->appendNL("\$this->requisitarView('" . $sName . "/visualizar', 'baseHtml');");
 
         return Helpers::createMethod("deletar", "\$id", $oBody);
-    }
-    
-    /**
-     * Método responsável por gerar o método listar
-     * Listar => Método responsável por levar a rota de visualização do grid de registros
-     */
-    private function defaultMethodListar($sName)
-    {
-        $oBody = new StringBuilder();
-        $oBody->appendNL("\$" . $sName . "BO = new " . ucfirst($sName) . "BO(new " . ucfirst($sName) . "DAO());\n")
-            ->appendNL("\$this->view->many" . ucfirst($sName) . " = \$" . $sName . "BO->buscarTodos();\n")
-            ->appendNL("\$this->requisitarView('" . $sName . "/listar', 'baseHtml');");
-        
-        return Helpers::createMethod("listar", null, $oBody);
     }
 }
