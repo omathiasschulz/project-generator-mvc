@@ -80,7 +80,8 @@ class GenerateController
         
         $oBody = new StringBuilder();
         $oBody->appendNL("if (!isset(\$request) || !isset(\$request->post)) { ")
-            ->appendNL("    Redirecionador::paraARota('cadastrar?cadastrado=0'); ")
+            ->appendNL("Redirecionador::paraARota('cadastrar?cadastrado=0'); ")
+            ->appendNL("return; ")
             ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
             ->appendNL("\$" . $sName . " = (new " . ucfirst($sName) . "())")
@@ -118,7 +119,8 @@ class GenerateController
         
         $oBody = new StringBuilder();
         $oBody->appendNL("if (!isset(\$request) || !isset(\$request->post)) { ")
-            ->appendNL("    Redirecionador::paraARota('alterar?alterado=0'); ")
+            ->appendNL("Redirecionador::paraARota('alterar?alterado=0'); ")
+            ->appendNL("return; ")
             ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
             ->appendNL("\$" . $sName . " = (new " . ucfirst($sName) . "())")
@@ -137,27 +139,21 @@ class GenerateController
     private function defaultMethodVisualizar($sName)
     {
         $oBody = new StringBuilder();
-        $oBody
-            ->appendNL("if (!isset(\$id) || is_array(\$id)) { ")
-            ->appendNL("    Redirecionador::paraARota('listar'); ")
+        $oBody->appendNL("if (!isset(\$" . $sName . ") || !is_object(\$" . $sName . ")) { ")
+            ->appendNL("Redirecionador::paraARota('listar'); ")
+            ->appendNL("return; ")
             ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
-            ->appendNL("\$" . $sName . " = " . $sName . "BO()->buscarUm();")
-            // ->appendNL(";")
-            // ->appendNL("\$result = \$" . $sName . "BO->atualizar(\$" . $sName . ");")
-            // ->append("Redirecionador::paraARota('alterar?alterado=' . \$result);")
+            ->appendNL("\$" . $sName . " = \$" . $sName . "BO->buscarUm(\$" . $sName . ");")
+            ->appendNL("if (empty(\$" . $sName . ")) {")
+            ->appendNL("Redirecionador::paraARota('listar');")
+            ->appendNL("return; ")
+            ->appendNL("}")
+            ->appendNL("\$this->view->" . $sName . " = \$" . $sName . ";")
+            ->append("\$this->requisitarView('visualizar', 'baseHtml');")
             ;
         
-        // $rocketBO = new RocketBO((new RocketDAOMySQL));
-        // $resultRocket = $rocketBO->findOneByRocketID($id);
-        // if (empty($resultRocket)) {
-        //     Redirecionador::paraARota('rocket/listar');
-        //     return;
-        // }
-        // $this->view->rocket = $resultRocket[0];
-
-        // $this->requisitarView('rocket/visualizar', 'baseHtml');
-        return Helpers::createMethod("visualizar", "\$id", $oBody);
+        return Helpers::createMethod("visualizar", ucfirst($sName) . " \$" . $sName, $oBody);
     }
 
     /**
@@ -181,18 +177,20 @@ class GenerateController
     private function defaultMethodDeletar($sName)
     {
         $oBody = new StringBuilder();
-        $oBody->appendNL("if (!isset(\$id) || is_array(\$id)) { ")
-            ->appendNL("    Redirecionador::paraARota('listar'); ")
+        $oBody->appendNL("if (!isset(\$" . $sName . ") || !is_object(\$" . $sName . ")) { ")
+            ->appendNL("Redirecionador::paraARota('listar'); ")
+            ->appendNL("return; ")
             ->appendNL("} ")
-        ->appendNL("\$" . $sName . "BO = new " . ucfirst($sName) . "BO(new " . ucfirst($sName) . "DAO());\n")
-            ->appendNL("\$result = \$" . $sName . "BO->buscarUm(\$id);")
-            ->appendNL("if (empty(\$result)) {")
-            ->appendNL("Redirecionador::paraARota('" . $sName . "/listar');")
-            ->appendNL("return;")
+            ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
+            ->appendNL("\$" . $sName . " = \$" . $sName . "BO->buscarUm(\$" . $sName . ");")
+            ->appendNL("if (empty(\$" . $sName . ")) {")
+            ->appendNL("Redirecionador::paraARota('listar');")
+            ->appendNL("return; ")
             ->appendNL("}")
-            ->appendNL("\$this->view->" . $sName . " = \$result;")
-            ->appendNL("\$this->requisitarView('" . $sName . "/visualizar', 'baseHtml');");
-
-        return Helpers::createMethod("deletar", "\$id", $oBody);
+            ->appendNL("\$" . $sName . " = \$" . $sName . "BO->deletar(\$" . $sName . ");")
+            ->append("Redirecionador::paraARota('listar'); ")
+            ;
+        
+        return Helpers::createMethod("deletar", ucfirst($sName) . " \$" . $sName, $oBody);
     }
 }
