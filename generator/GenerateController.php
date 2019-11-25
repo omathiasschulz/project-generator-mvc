@@ -44,7 +44,7 @@ class GenerateController
         $oBody->append(self::defaultMethodCadastrar($sName))
             ->append(self::defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys))
             ->append(self::defaultMethodAtualizar($sName))
-            ->append(self::defaultMethodAlterar($sName))
+            ->append(self::defaultMethodAlterar($sName, $aAttributes, $aPrimaryKeys))
             ->append(self::defaultMethodVisualizar($sName))
             ->append(self::defaultMethodListar($sName))
             ->append(self::defaultMethodDeletar($sName))
@@ -79,7 +79,10 @@ class GenerateController
                 );
         
         $oBody = new StringBuilder();
-        $oBody->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
+        $oBody->appendNL("if (!isset(\$request) || !isset(\$request->post)) { ")
+            ->appendNL("    Redirecionador::paraARota('cadastrar?cadastrado=0'); ")
+            ->appendNL("} ")
+            ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
             ->appendNL("\$" . $sName . " = (new " . ucfirst($sName) . "())")
             ->appendNL($oFieldsSet . ";")
             ->appendNL("\$result = \$" . $sName . "BO->inserir(\$" . $sName . ");")
@@ -96,9 +99,8 @@ class GenerateController
     private function defaultMethodAtualizar($sName)
     {
         $oBody = new StringBuilder();
-        $oBody->append(
-            "// metodo atualizar"
-        );
+        $oBody->append("\$this->requisitarView('" . $sName . "/atualizar', 'baseHtml');");
+
         return Helpers::createMethod("atualizar", "\$id", $oBody);
     }
 
@@ -106,12 +108,25 @@ class GenerateController
      * Método responsável por gerar o método alterar
      * Alterar => Método responsável por receber o request com o registro e alterar no banco 
      */
-    private function defaultMethodAlterar($sName)
+    private function defaultMethodAlterar($sName, $aAttributes)
     {
+        $oFieldsSet = new StringBuilder();
+        foreach ($aAttributes as $oAttribute)
+            $oFieldsSet->appendNL(
+                "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? \$request->post->" . $oAttribute->nome . " : '')"
+            );
+        
         $oBody = new StringBuilder();
-        $oBody->append(
-            "// metodo alterar"
-        );
+        $oBody->appendNL("if (!isset(\$request) || !isset(\$request->post)) { ")
+            ->appendNL("    Redirecionador::paraARota('alterar?alterado=0'); ")
+            ->appendNL("} ")
+            ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
+            ->appendNL("\$" . $sName . " = (new " . ucfirst($sName) . "())")
+            ->appendNL($oFieldsSet . ";")
+            ->appendNL("\$result = \$" . $sName . "BO->atualizar(\$" . $sName . ");")
+            ->append("Redirecionador::paraARota('alterar?alterado=' . \$result);")
+            ;
+        
         return Helpers::createMethod("alterar", "\$request", $oBody);
     }
 
@@ -122,9 +137,26 @@ class GenerateController
     private function defaultMethodVisualizar($sName)
     {
         $oBody = new StringBuilder();
-        $oBody->append(
-            "// metodo visualizar"
-        );
+        $oBody
+            ->appendNL("if (!isset(\$id) || is_array(\$id)) { ")
+            ->appendNL("    Redirecionador::paraARota('listar'); ")
+            ->appendNL("} ")
+            ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
+            ->appendNL("\$" . $sName . " = " . $sName . "BO()->buscarUm();")
+            // ->appendNL(";")
+            // ->appendNL("\$result = \$" . $sName . "BO->atualizar(\$" . $sName . ");")
+            // ->append("Redirecionador::paraARota('alterar?alterado=' . \$result);")
+            ;
+        
+        // $rocketBO = new RocketBO((new RocketDAOMySQL));
+        // $resultRocket = $rocketBO->findOneByRocketID($id);
+        // if (empty($resultRocket)) {
+        //     Redirecionador::paraARota('rocket/listar');
+        //     return;
+        // }
+        // $this->view->rocket = $resultRocket[0];
+
+        // $this->requisitarView('rocket/visualizar', 'baseHtml');
         return Helpers::createMethod("visualizar", "\$id", $oBody);
     }
 
@@ -149,7 +181,10 @@ class GenerateController
     private function defaultMethodDeletar($sName)
     {
         $oBody = new StringBuilder();
-        $oBody->appendNL("\$" . $sName . "BO = new " . ucfirst($sName) . "BO(new " . ucfirst($sName) . "DAO());\n")
+        $oBody->appendNL("if (!isset(\$id) || is_array(\$id)) { ")
+            ->appendNL("    Redirecionador::paraARota('listar'); ")
+            ->appendNL("} ")
+        ->appendNL("\$" . $sName . "BO = new " . ucfirst($sName) . "BO(new " . ucfirst($sName) . "DAO());\n")
             ->appendNL("\$result = \$" . $sName . "BO->buscarUm(\$id);")
             ->appendNL("if (empty(\$result)) {")
             ->appendNL("Redirecionador::paraARota('" . $sName . "/listar');")
