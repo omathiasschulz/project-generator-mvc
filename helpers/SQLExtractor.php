@@ -124,7 +124,7 @@ class SQLExtractor
         if (!$aPrimaryKeys[0])
             return $aPrimaryKeys;
         $aFormattedAttributes[] = ['chaves_primarias' => $aPrimaryKeys[1]];
-        $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)$/";
+        $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)[[:space:]]*$/";
         $sAttributes = preg_split($sPattern, $sAttributes)[0];
 
         // Realiza um split na vírgula 
