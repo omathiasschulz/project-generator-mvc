@@ -2,9 +2,6 @@
 
 namespace generator;
 
-use helpers\Helpers;
-use helpers\StringBuilder;
-
 class GenerateCore 
 {
     /**
@@ -12,7 +9,6 @@ class GenerateCore
      */
     public function create()
     {
-        \exec("cd ../");
-        \exec("git clone https://github.com/mathiasarturschulz/core.git");
+        exec("cd Project/ && git clone https://github.com/mathiasarturschulz/core.git");
     }
 }

@@ -4,7 +4,7 @@ namespace helpers;
 
 class Helpers
 {
-    const GLOBAL_PATH = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
+    const GLOBAL_PATH = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Project' . DIRECTORY_SEPARATOR;
 
     /**
      * Método que cria/sobreescreve um file com o conteúdo desejado

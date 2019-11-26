@@ -26,8 +26,11 @@ class Generate
         GenerateController::create($aDatabase->tabelas);
         GenerateModel::create($aDatabase->tabelas, self::TYPES_DATA);
         GenerateCore::create();
+        GenerateIndex::create();
+        GenerateHtAccess::create();
+        GenerateComposer::create();
 
-        return [true, 'Projeto gerado com sucesso.'];
+        return [true, "Projeto gerado com sucesso! \n"];
     }
 
     /**

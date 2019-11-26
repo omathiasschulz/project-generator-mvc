@@ -1,4 +1,2 @@
-app/
-core/
-vendor/
-composer.lock
+Project/
+app/vendor

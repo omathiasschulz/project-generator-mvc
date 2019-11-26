@@ -1,0 +1,16 @@
+{
+	"name": "projectGenerator/projectGenerator",
+	"description": "projectGenerator",
+	"type": "project",
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"helpers\\": [
+				"helpers/"
+			],
+			"generator\\": [
+				"generator/"
+			]
+		}
+	}
+}
