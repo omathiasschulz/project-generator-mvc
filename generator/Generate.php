@@ -28,7 +28,6 @@ class Generate
         GenerateCore::create();
         GenerateIndex::create();
         GenerateHtAccess::create();
-        GenerateComposer::create();
 
         return [true, 'Projeto gerado com sucesso.'];
     }

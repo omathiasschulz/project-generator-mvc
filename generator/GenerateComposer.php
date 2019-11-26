@@ -1,19 +1,21 @@
 <?php
 
-namespace generator;
-
-use helpers\Helpers;
-use helpers\StringBuilder;
-
 class GenerateComposer
 {
+    const GLOBAL_PATH = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
+
     /**
      * Método responsável por gerar o composer.json
      */
     public static function create()
     {
-        $oBody = self::getBody();
-        Helpers::writeFile('composer.json', $oBody);
+        $sBody = self::getBody();
+        $sFilename = 'composer.json';
+
+        $completeFilename = self::GLOBAL_PATH . $sFilename;
+        $fp = fopen($completeFilename, 'w');
+        fwrite($fp, $sBody);
+        fclose($fp);
 
         // Executa o comando de geração do composer
         exec("composer update");
@@ -24,33 +26,33 @@ class GenerateComposer
      */
     private function getBody()
     {
-        $oBody = new StringBuilder();
-        $oBody->appendNL("{")
-            ->appendNL("\t\"name\": \"projectGenerator/projectGenerator\",")
-            ->appendNL("\t\"description\": \"projectGenerator\",")
-            ->appendNL("\t\"type\": \"project\",")
-            ->appendNL("\t\"license\": \"MIT\",")
-            ->appendNL("\t\"autoload\": {")
-            ->appendNL("\t\t\"psr-4\": {")
-            ->appendNL("\t\t\t\"helpers\\\": [")
-            ->appendNL("\t\t\t\t\"helpers/\"")
-            ->appendNL("\t\t\t],")
-            ->appendNL("\t\t\t\"generator\\\": [")
-            ->appendNL("\t\t\t\t\"generator/\"")
-            ->appendNL("\t\t\t],")
-            ->appendNL("\t\t\t\"core\\\": [")
-            ->appendNL("\t\t\t\t\"core/\"")
-            ->appendNL("\t\t\t],")
-            ->appendNL("\t\t\t\"app\\\": [")
-            ->appendNL("\t\t\t\t\"app/\"")
-            ->appendNL("\t\t\t]")
-            ->appendNL("\t\t}")
-            ->appendNL("\t},")
-            ->appendNL("\t\"require\": {")
-            ->appendNL("\t\t\"components/bootstrap\": \"4.3.*\"")
-            ->appendNL("\t}")
-            ->appendNL("}");
+        $sBody = 
+              "{\n"
+            . "\t\"name\": \"projectGenerator/projectGenerator\",\n"
+            . "\t\"description\": \"projectGenerator\",\n"
+            . "\t\"type\": \"project\",\n"
+            . "\t\"license\": \"MIT\",\n"
+            . "\t\"autoload\": {\n"
+            . "\t\t\"psr-4\": {\n"
+            . "\t\t\t\"helpers\\\\\": [\n"
+            . "\t\t\t\t\"helpers/\"\n"
+            . "\t\t\t],\n"
+            . "\t\t\t\"generator\\\\\": [\n"
+            . "\t\t\t\t\"generator/\"\n"
+            . "\t\t\t],\n"
+            . "\t\t\t\"core\\\\\": [\n"
+            . "\t\t\t\t\"core/\"\n"
+            . "\t\t\t],\n"
+            . "\t\t\t\"app\\\\\": [\n"
+            . "\t\t\t\t\"app/\"\n"
+            . "\t\t\t]\n"
+            . "\t\t}\n"
+            . "\t},\n"
+            . "\t\"require\": {\n"
+            . "\t\t\"components/bootstrap\": \"4.3.*\"\n"
+            . "\t}\n"
+            . "}\n";
             
-        return $oBody;
+        return $sBody;
     }
 }
