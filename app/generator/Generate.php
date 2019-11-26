@@ -8,7 +8,7 @@ use helpers\SQLExtractor;
 
 class Generate
 {
-    const SQL = 'sql.sql';
+    const SQL = '../sql.sql';
     const TYPES_DATA = ['date', 'time', 'datetime', 'year'];
 
     /**
