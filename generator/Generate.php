@@ -30,7 +30,7 @@ class Generate
         GenerateHtAccess::create();
         GenerateComposer::create();
 
-        return [true, 'Projeto gerado com sucesso.'];
+        return [true, "Projeto gerado com sucesso! \n"];
     }
 
     /**
