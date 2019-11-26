@@ -1,7 +1,5 @@
 app/
 core/
-vendor/
 composer.lock
-composer.json
 .htaccess
 index.php
