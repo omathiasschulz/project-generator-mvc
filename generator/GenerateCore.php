@@ -2,9 +2,6 @@
 
 namespace generator;
 
-use helpers\Helpers;
-use helpers\StringBuilder;
-
 class GenerateCore 
 {
     /**

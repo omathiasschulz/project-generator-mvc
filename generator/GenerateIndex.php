@@ -1,34 +1,31 @@
 <?php
 
 namespace generator;
-// require_once('Helpers.php');
+
+use helpers\Helpers;
+use helpers\StringBuilder;
 
 class GenerateIndex
 {
     /**
-     * Método responsável por gerar o index de teste
+     * Método responsável por gerar o index
      */
-    public static function create($autoloadFilename)
+    public static function create()
     {
-        $index = self::getIndex($autoloadFilename);
-        Helpers::writeFile('testeConexaoBanco.php', $index);
+        $oBody = self::getBody();
+        Helpers::writeFile('index.php', $oBody);
     }
 
     /**
      * Método que gera a string que será gravada no index.php
      */
-    private function getIndex($autoloadFilename)
+    private function getBody()
     {
-        return 
-'<?php
+        $oBody = new StringBuilder();
+        $oBody->appendNL("<?php\n")
+            ->appendNL("require_once 'vendor/autoload.php';")
+            ->appendNL("require_once 'core/bootstrap.php';");
 
-require_once("' . $autoloadFilename . '");
-require_once("app/conexao/Conexao.php");
-
-if (Conexao::startConnection())
-    echo "Conexão efetuada com sucesso!";
-else
-    echo "Erro ao conectar ao banco!";
-';
+        return $oBody;
     }
 }
