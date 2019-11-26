@@ -13,8 +13,7 @@ class GenerateComposer
     {
         $oBody = self::getBody();
         Helpers::writeFile('composer.json', $oBody);
-        // Executa o comando de geração do composer
-        exec("composer update");
+        exec("cd Project/ && composer update");
     }
     /**
      * Método que gera a string que será gravada no composer.json
