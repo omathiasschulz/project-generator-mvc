@@ -4,13 +4,14 @@
 
 Iniciando a geração do projeto
 
-Execute o comando abaixo para buscar as dependências do ProjectGenerator
+Execute o comando abaixo no diretório ProjectGenerator para buscar as dependências do ProjectGenerator
 
 ```
 cd app/ && composer update
 ```
 
 Insira o SQL do projeto a ser gerado no arquivo sql.sql
+
 Exemplo de um SQL permitido:
 
 ```
@@ -29,7 +30,7 @@ create table produto (
 );
 ```
 
-Após inserir o SQL execute o comando de geração do projeto do diretório ProjectGenerator
+Após inserir o SQL execute o comando de geração do projeto no diretório ProjectGenerator
 
 ```
 php start.php
