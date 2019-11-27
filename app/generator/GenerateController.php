@@ -75,7 +75,7 @@ class GenerateController
         $oBody->append(self::defaultMethodCadastrar($sName))
             ->append(self::defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys, $aTypesData))
             ->append(self::defaultMethodAtualizar($sName, $aPrimaryKeys))
-            ->append(self::defaultMethodAlterar($sName, $aAttributes, $aPrimaryKeys))
+            ->append(self::defaultMethodAlterar($sName, $aAttributes, $aTypesData))
             ->append(self::defaultMethodVisualizar($sName, $aPrimaryKeys))
             ->append(self::defaultMethodListar($sName))
             ->append(self::defaultMethodDeletar($sName, $aPrimaryKeys))
@@ -154,13 +154,20 @@ class GenerateController
      * Método responsável por gerar o método alterar
      * Alterar => Método responsável por receber o request com o registro e alterar no banco 
      */
-    private function defaultMethodAlterar($sName, $aAttributes)
+    private function defaultMethodAlterar($sName, $aAttributes, $aTypesData)
     {
         $oFieldsSet = new StringBuilder();
         foreach ($aAttributes as $oAttribute)
-            $oFieldsSet->appendNL(
-                "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? \$request->post->" . $oAttribute->nome . " : '')"
-            );
+            // Validação especial para o tipo data
+            if (in_array($oAttribute->tipo, $aTypesData)) {
+                $oFieldsSet->appendNL(
+                    "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? new Datetime(\$request->post->" . $oAttribute->nome . ") : '')"
+                );
+            } else {
+                $oFieldsSet->appendNL(
+                    "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? \$request->post->" . $oAttribute->nome . " : '')"
+                );
+            }
         
         $oBody = new StringBuilder();
         $oBody->appendNL("if (!isset(\$request) || !isset(\$request->post)) { ")
@@ -171,7 +178,7 @@ class GenerateController
             ->appendNL("\$" . $sName . " = (new " . ucfirst($sName) . "())")
             ->appendNL($oFieldsSet . ";")
             ->appendNL("\$result = \$" . $sName . "BO->atualizar(\$" . $sName . ");")
-            ->append("Redirecionador::paraARota('alterar?alterado=' . \$result);")
+            ->append("Redirecionador::paraARota('listar?alterado=' . \$result);")
             ;
         
         return Helpers::createMethod("alterar", "\$request", $oBody);

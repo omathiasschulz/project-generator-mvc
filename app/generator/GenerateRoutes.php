@@ -37,7 +37,7 @@ class GenerateRoutes
             . "\n// Rota que leva a tela de alteração de um registro "
             . "\n\$route[] = ['/" . $routeName . "/{id}/atualizar', '" . ucfirst($routeName) . "Controller@atualizar'];"
             . "\n// Rota que recebe o request com o registro e altera no banco "
-            . "\n\$route[] = ['/" . $routeName . "/alterar', '" . ucfirst($routeName) . "Controller@atualizar'];"
+            . "\n\$route[] = ['/" . $routeName . "/alterar', '" . ucfirst($routeName) . "Controller@alterar'];"
             . "\n// Rota que leva a tela de visualização de um registro "
             . "\n\$route[] = ['/" . $routeName . "/{id}/visualizar', '" . ucfirst($routeName) . "Controller@visualizar'];"
             . "\n// Rota que leva a tela de visualização com todos os registros "
