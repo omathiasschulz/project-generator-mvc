@@ -1,0 +1,55 @@
+
+<div class="container">
+<br><h1>Produto</h1><br>
+
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="codigo">codigo</label>
+        <input type="text" class="form-control" value="<?= $this->view->produto->getCodigo() ?>" id="codigo" name="codigo" placeholder="codigo" readonly>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="descricao">descricao</label>
+        <input type="text" class="form-control" value="<?= $this->view->produto->getDescricao() ?>" id="descricao" name="descricao" placeholder="descricao" readonly>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="valorBruto">valorBruto</label>
+        <input type="text" class="form-control" value="<?= $this->view->produto->getValorBruto() ?>" id="valorBruto" name="valorBruto" placeholder="valorBruto" readonly>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="valorLiquido">valorLiquido</label>
+        <input type="text" class="form-control" value="<?= $this->view->produto->getValorLiquido() ?>" id="valorLiquido" name="valorLiquido" placeholder="valorLiquido" readonly>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="peso">peso</label>
+        <input type="text" class="form-control" value="<?= $this->view->produto->getPeso() ?>" id="peso" name="peso" placeholder="peso" readonly>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="pesoEmbalado">pesoEmbalado</label>
+        <input type="text" class="form-control" value="<?= $this->view->produto->getPesoEmbalado() ?>" id="pesoEmbalado" name="pesoEmbalado" placeholder="pesoEmbalado" readonly>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="dataFabricacao">dataFabricacao</label>
+        <input type="date" class="form-control" value="<?= $this->view->produto->getDataFabricacao()->format('Y-m-d') ?>" id="dataFabricacao" name="dataFabricacao" placeholder="dataFabricacao" readonly>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label for="dataCompra">dataCompra</label>
+        <input type="date" class="form-control" value="<?= $this->view->produto->getDataCompra()->format('Y-m-d') ?>" id="dataCompra" name="dataCompra" placeholder="dataCompra" readonly>
+    </div>
+</div>
+
+<input type="button" onclick="location.href='/produto/listar';" class="btn btn-sm btn-success float-right" value="Voltar" />
+</div><br><br><br><br>

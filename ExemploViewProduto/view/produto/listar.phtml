@@ -1,1 +1,31 @@
-<h1>Listar todos Produto</h1>
+
+<div class="container">
+<br><h1>Produto</h1><br>
+<div class="table-wrapper">
+
+<table class="table table-striped table-hover">
+
+    <thead>
+        <tr>
+            <th>codigo</th>
+            <th>descricao</th>
+            <th>valorBruto</th>
+            <th>valorLiquido</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    <?php foreach ($this->view->manyProduto as $produto): ?>
+    <tr onclick="location.href = '/produto/<?php echo $produto->getCodigo(); ?>/visualizar';" style="cursor: pointer;">
+            <td><?php echo $produto->getCodigo(); ?> </td>
+            <td><?php echo $produto->getDescricao(); ?> </td>
+            <td><?php echo $produto->getValorBruto(); ?> </td>
+            <td><?php echo $produto->getValorLiquido(); ?> </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+
+</table>
+
+</div>
+</div>

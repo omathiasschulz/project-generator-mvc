@@ -76,7 +76,7 @@ class GenerateController
             ->append(self::defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys, $aTypesData))
             ->append(self::defaultMethodAtualizar($sName))
             ->append(self::defaultMethodAlterar($sName, $aAttributes, $aPrimaryKeys))
-            ->append(self::defaultMethodVisualizar($sName))
+            ->append(self::defaultMethodVisualizar($sName, $aPrimaryKeys))
             ->append(self::defaultMethodListar($sName))
             ->append(self::defaultMethodDeletar($sName))
             ;
@@ -175,24 +175,27 @@ class GenerateController
      * Método responsável por gerar o método visualizar
      * Visualizar => Método responsável por levar a tela de visualização de um registro 
      */
-    private function defaultMethodVisualizar($sName)
+    private function defaultMethodVisualizar($sName, $aPrimaryKeys)
     {
         $oBody = new StringBuilder();
-        $oBody->appendNL("if (!isset(\$" . $sName . ") || !is_object(\$" . $sName . ")) { ")
-            ->appendNL("Redirecionador::paraARota('listar'); ")
-            ->appendNL("return; ")
-            ->appendNL("} ")
+        $oBody
+            // ->appendNL("if (!isset(\$id) || !is_null(\$id)) { ")
+            // ->appendNL("Redirecionador::paraARota('listar'); ")
+            // ->appendNL("return; ")
+            // ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
+            ->appendNL("\$" . $sName . " = new " . ucfirst($sName) . "();")
+            ->appendNL("\$" . $sName . "->set" . ucfirst($aPrimaryKeys[0]) . "(\$id);")
             ->appendNL("\$" . $sName . " = \$" . $sName . "BO->buscarUm(\$" . $sName . ");")
-            ->appendNL("if (empty(\$" . $sName . ")) {")
-            ->appendNL("Redirecionador::paraARota('listar');")
-            ->appendNL("return; ")
-            ->appendNL("}")
+            // ->appendNL("if (empty(\$" . $sName . ")) {")
+            // ->appendNL("Redirecionador::paraARota('listar');")
+            // ->appendNL("return; ")
+            // ->appendNL("}")
             ->appendNL("\$this->view->" . $sName . " = \$" . $sName . ";")
-            ->append("\$this->requisitarView('visualizar', 'baseHtml');")
+            ->append("\$this->requisitarView('" . $sName . "/visualizar', 'baseHtml');")
             ;
         
-        return Helpers::createMethod("visualizar", ucfirst($sName) . " \$" . $sName, $oBody);
+        return Helpers::createMethod("visualizar", "\$id", $oBody);
     }
 
     /**
