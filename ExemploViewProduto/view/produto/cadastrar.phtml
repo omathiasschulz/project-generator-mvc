@@ -1,1 +1,58 @@
-<h1>Cadastrar Produto</h1>
+<div class="container">
+<br><h1>Produto</h1><br>
+
+<form action="/produto/inserir" method="POST">
+
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="codigo">codigo</label>
+            <input type="text" class="form-control" id="codigo" name="codigo" placeholder="codigo" readonly>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="descricao">descricao</label>
+            <input type="text" class="form-control" id="descricao" name="descricao" placeholder="descricao">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="valorBruto">valorBruto</label>
+            <input type="text" class="form-control" id="valorBruto" name="valorBruto" placeholder="valorBruto">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="valorLiquido">valorLiquido</label>
+            <input type="text" class="form-control" id="valorLiquido" name="valorLiquido" placeholder="valorLiquido">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="peso">peso</label>
+            <input type="text" class="form-control" id="peso" name="peso" placeholder="peso">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="pesoEmbalado">pesoEmbalado</label>
+            <input type="text" class="form-control" id="pesoEmbalado" name="pesoEmbalado" placeholder="pesoEmbalado">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="dataFabricacao">dataFabricacao</label>
+            <input type="date" class="form-control" id="dataFabricacao" name="dataFabricacao" placeholder="dataFabricacao">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="dataCompra">dataCompra</label>
+            <input type="date" class="form-control" id="dataCompra" name="dataCompra" placeholder="dataCompra">
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-sm btn-primary float-right"><i class='fa fa-plus-circle'></i> Adicionar</button>
+</form>
+
+</div><br><br><br><br>

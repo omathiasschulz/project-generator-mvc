@@ -10,7 +10,7 @@ class GenerateController
     /**
      * Método responsável por gerar os controllers das tabelas
      */
-    public function create($aTables)
+    public function create($aTables, $aTypesData)
     {
         self::homeController();
 
@@ -19,7 +19,7 @@ class GenerateController
             $aAttributes = $oTable->atributos;
             $oPrimaryKeys = array_shift($aAttributes);
             $aPrimaryKeys = $oPrimaryKeys->chaves_primarias;
-            $oBody = self::defaultMethods($oTable->nome, $aAttributes, $aPrimaryKeys);
+            $oBody = self::defaultMethods($oTable->nome, $aAttributes, $aPrimaryKeys, $aTypesData);
 
             Helpers::createClass(
                 ucfirst($oTable->nome)."Controller", 
@@ -31,6 +31,7 @@ class GenerateController
                     "app\\model\\dto\\".ucfirst($oTable->nome),
                     "app\\model\\dao\\".ucfirst($oTable->nome)."DAO",
                     "app\\model\\bo\\".ucfirst($oTable->nome)."BO",
+                    "Datetime"
                 ],
                 'AbsController'
             );
@@ -68,11 +69,11 @@ class GenerateController
     /**
      * Método responsável por criar os métodos padrões de um controller
      */
-    private function defaultMethods($sName, $aAttributes, $aPrimaryKeys)
+    private function defaultMethods($sName, $aAttributes, $aPrimaryKeys, $aTypesData)
     {
         $oBody = new StringBuilder();
         $oBody->append(self::defaultMethodCadastrar($sName))
-            ->append(self::defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys))
+            ->append(self::defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys, $aTypesData))
             ->append(self::defaultMethodAtualizar($sName))
             ->append(self::defaultMethodAlterar($sName, $aAttributes, $aPrimaryKeys))
             ->append(self::defaultMethodVisualizar($sName))
@@ -99,14 +100,22 @@ class GenerateController
      * Método responsável por gerar o método inserir
      * Inserir => Método responsável por receber o request com o registro e inserir no banco 
      */
-    private function defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys)
+    private function defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys, $aTypesData)
     {
         $oFieldsSet = new StringBuilder();
         foreach ($aAttributes as $oAttribute)
-            if (!in_array($oAttribute->nome, $aPrimaryKeys)) 
-                $oFieldsSet->appendNL(
-                    "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? \$request->post->" . $oAttribute->nome . " : '')"
-                );
+            if (!in_array($oAttribute->nome, $aPrimaryKeys)) {
+                // Validação especial para o tipo data
+                if (in_array($oAttribute->tipo, $aTypesData)) {
+                    $oFieldsSet->appendNL(
+                        "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? new Datetime(\$request->post->" . $oAttribute->nome . ") : '')"
+                    );
+                } else {
+                    $oFieldsSet->appendNL(
+                        "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? \$request->post->" . $oAttribute->nome . " : '')"
+                    );
+                }
+            }
         
         $oBody = new StringBuilder();
         $oBody->appendNL("if (!isset(\$request) || !isset(\$request->post)) { ")
