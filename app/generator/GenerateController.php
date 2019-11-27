@@ -12,6 +12,8 @@ class GenerateController
      */
     public function create($aTables)
     {
+        self::homeController();
+
         foreach ($aTables as $oTable) {
             // Remove a primeira posição do array, que são as chaves primárias
             $aAttributes = $oTable->atributos;
@@ -33,6 +35,34 @@ class GenerateController
                 'AbsController'
             );
         }
+    }
+
+    /**
+     * Método responsável por gerar a classe HomeController
+     */
+    private function homeController()
+    {
+        $oBody = new StringBuilder();
+        $oBody->append(self::homeControllerIndex());
+        
+        Helpers::createClass(
+            "HomeController", 
+            $oBody, 
+            'app/controller/',
+            ["core\\AbsController"],
+            'AbsController'
+        );
+    }
+
+    /**
+     * Método responsável por gerar o método index do HomeController
+     */
+    private function homeControllerIndex()
+    {
+        $oBody = new StringBuilder();
+        $oBody->append("\$this->requisitarView('index', 'baseHtml');");
+
+        return Helpers::createMethod("index", null, $oBody);
     }
 
     /**

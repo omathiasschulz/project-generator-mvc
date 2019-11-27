@@ -11,7 +11,10 @@ class GenerateRoutes
      */
     public static function create($aTabelas)
     {
-        $routes = "<?php\n";
+        $routes = "<?php\n"
+            . "\n// Rota da página principal"
+            . "\n\$route[] = ['/', 'HomeController@index'];\n"
+        ;
         foreach ($aTabelas as $oTabela) {
             $routes .= self::defaultRoutes($oTabela->nome);
         }
