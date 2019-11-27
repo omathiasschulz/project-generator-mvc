@@ -74,11 +74,11 @@ class GenerateController
         $oBody = new StringBuilder();
         $oBody->append(self::defaultMethodCadastrar($sName))
             ->append(self::defaultMethodInserir($sName, $aAttributes, $aPrimaryKeys, $aTypesData))
-            ->append(self::defaultMethodAtualizar($sName))
+            ->append(self::defaultMethodAtualizar($sName, $aPrimaryKeys))
             ->append(self::defaultMethodAlterar($sName, $aAttributes, $aPrimaryKeys))
             ->append(self::defaultMethodVisualizar($sName, $aPrimaryKeys))
             ->append(self::defaultMethodListar($sName))
-            ->append(self::defaultMethodDeletar($sName))
+            ->append(self::defaultMethodDeletar($sName, $aPrimaryKeys))
             ;
         
         return $oBody;
@@ -136,10 +136,16 @@ class GenerateController
      * Método responsável por gerar o método atualizar
      * Atualizar => Método responsável por levar a tela de alteração de um registro 
      */
-    private function defaultMethodAtualizar($sName)
+    private function defaultMethodAtualizar($sName, $aPrimaryKeys)
     {
         $oBody = new StringBuilder();
-        $oBody->append("\$this->requisitarView('" . $sName . "/atualizar', 'baseHtml');");
+        $oBody
+            ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
+            ->appendNL("\$" . $sName . " = new " . ucfirst($sName) . "();")
+            ->appendNL("\$" . $sName . "->set" . ucfirst($aPrimaryKeys[0]) . "(\$id);")
+            ->appendNL("\$" . $sName . " = \$" . $sName . "BO->buscarUm(\$" . $sName . ");")
+            ->appendNL("\$this->view->" . $sName . " = \$" . $sName . ";")
+            ->append("\$this->requisitarView('" . $sName . "/atualizar', 'baseHtml');");
 
         return Helpers::createMethod("atualizar", "\$id", $oBody);
     }
@@ -216,23 +222,22 @@ class GenerateController
      * Método responsável por gerar o método deletar
      * Deletar => Método responsável por receber o id do registro e excluir do banco 
      */
-    private function defaultMethodDeletar($sName)
+    private function defaultMethodDeletar($sName, $aPrimaryKeys)
     {
         $oBody = new StringBuilder();
-        $oBody->appendNL("if (!isset(\$" . $sName . ") || !is_object(\$" . $sName . ")) { ")
-            ->appendNL("Redirecionador::paraARota('listar'); ")
-            ->appendNL("return; ")
-            ->appendNL("} ")
+        $oBody
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
+            ->appendNL("\$" . $sName . " = new " . ucfirst($sName) . "();")
+            ->appendNL("\$" . $sName . "->set" . ucfirst($aPrimaryKeys[0]) . "(\$id);")
             ->appendNL("\$" . $sName . " = \$" . $sName . "BO->buscarUm(\$" . $sName . ");")
             ->appendNL("if (empty(\$" . $sName . ")) {")
-            ->appendNL("Redirecionador::paraARota('listar');")
+            ->appendNL("self::listar();")
             ->appendNL("return; ")
             ->appendNL("}")
             ->appendNL("\$" . $sName . " = \$" . $sName . "BO->deletar(\$" . $sName . ");")
-            ->append("Redirecionador::paraARota('listar'); ")
+            ->append("self::listar();")
             ;
         
-        return Helpers::createMethod("deletar", ucfirst($sName) . " \$" . $sName, $oBody);
+        return Helpers::createMethod("deletar", "\$id", $oBody);
     }
 }

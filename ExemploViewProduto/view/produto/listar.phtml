@@ -11,16 +11,21 @@
             <th>descricao</th>
             <th>valorBruto</th>
             <th>valorLiquido</th>
+            <th>Ações<th>
         </tr>
     </thead>
 
     <tbody>
     <?php foreach ($this->view->manyProduto as $produto): ?>
-    <tr onclick="location.href = '/produto/<?php echo $produto->getCodigo(); ?>/visualizar';" style="cursor: pointer;">
-            <td><?php echo $produto->getCodigo(); ?> </td>
-            <td><?php echo $produto->getDescricao(); ?> </td>
-            <td><?php echo $produto->getValorBruto(); ?> </td>
-            <td><?php echo $produto->getValorLiquido(); ?> </td>
+    <tr style="cursor: pointer;">
+            <td onclick="location.href = '/produto/<?php echo $produto->getCodigo(); ?>/visualizar';"><?php echo $produto->getCodigo(); ?> </td>
+            <td onclick="location.href = '/produto/<?php echo $produto->getCodigo(); ?>/visualizar';"><?php echo $produto->getDescricao(); ?> </td>
+            <td onclick="location.href = '/produto/<?php echo $produto->getCodigo(); ?>/visualizar';"><?php echo $produto->getValorBruto(); ?> </td>
+            <td onclick="location.href = '/produto/<?php echo $produto->getCodigo(); ?>/visualizar';"><?php echo $produto->getValorLiquido(); ?> </td>
+            <td>
+                <input type="button" onclick="location.href='/produto/<?php echo $produto->getCodigo(); ?>/atualizar';" class="btn btn-sm btn-primary" value="Atualizar" />
+                <input type="button" onclick="location.href='/produto/<?php echo $produto->getCodigo(); ?>/deletar';" class="btn btn-sm btn-success" value="Deletar" />
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>
