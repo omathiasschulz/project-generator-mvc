@@ -7,7 +7,7 @@ class SQLExtractor
     // Regex que pega tudo até o primeiro ponto e vírgula
     const PATTERN_TO_THE_SEMICOLON = "/(?i)\A([^;]+)\;/";
 
-    const TYPES_NORMAL = ['decimal', 'tinyint', 'int', 'bigint', 'float', 'double', 'date', 'time', 'datetime', 'year'];
+    const TYPES_NORMAL = ['decimal', 'tinyint', 'int', 'bigint', 'float', 'double', 'date', 'datetime'];
     const TYPES_WITH_CONFIG_ONE = ['varchar', 'decimal'];
     const TYPES_WITH_CONFIG_TWO = ['decimal'];
 

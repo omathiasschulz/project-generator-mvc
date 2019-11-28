@@ -68,10 +68,16 @@ class GenerateModelDao
                 $oFieldsBind->appendNL("\$stmt->bindParam(':" . $oAttribute->nome . "', \$" . $oAttribute->nome . ", PDO::PARAM_STR);");
                 $oFieldsUpdate->append($oAttribute->nome . " = :" . $oAttribute->nome . ", ");
                 
+                // Validação setar a data apenas se ela foi preenchida
+				// Caso não tenha sido preenchida poderá estar no formato
+				// 0000-00-00 00:00:00, 0000, entre outros
+				// Se data não foi preenchida retorna 1 se não 0
+				// preg_match_all("/(?i)^([0:\- ]*)$/", $data);
+
                 // Validação especial para o tipo data
                 if (in_array($oAttribute->tipo, $aTypesData)) {
                     $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = (\$" . $sName . "->get" . ucfirst($oAttribute->nome) . "() != \"\") ? \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "()->format('Y-m-d H:i:s') : '';");
-                    $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(new Datetime(\$linha['" . $oAttribute->nome . "']))");
+                    $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(!preg_match_all(\"/(?i)^([0:\- ]*)$/\", \$linha['" . $oAttribute->nome . "']) ? new Datetime(\$linha['" . $oAttribute->nome . "']) : '')");
                 } else {
                     $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "();");
                     $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(\$linha['" . $oAttribute->nome . "'])");
