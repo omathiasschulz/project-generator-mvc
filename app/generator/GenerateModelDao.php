@@ -70,7 +70,7 @@ class GenerateModelDao
                 
                 // Validação especial para o tipo data
                 if (in_array($oAttribute->tipo, $aTypesData)) {
-                    $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "()->format('Y-m-d H:i:s');");
+                    $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = (\$" . $sName . "->get" . ucfirst($oAttribute->nome) . "() != \"\") ? \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "()->format('Y-m-d H:i:s') : '';");
                     $oFieldsSet->appendNL("\t->set" . ucfirst($oAttribute->nome) . "(new Datetime(\$linha['" . $oAttribute->nome . "']))");
                 } else {
                     $oFieldsGet->appendNL("\$" . $oAttribute->nome . " = \$" . $sName . "->get" . ucfirst($oAttribute->nome) . "();");

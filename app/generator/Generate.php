@@ -23,7 +23,12 @@ class Generate
 
         GenerateRoutes::create($aDatabase->tabelas);
         GenerateConexao::create($aDatabase->nome);
+<<<<<<< Updated upstream
+        GenerateController::create($aDatabase->tabelas, self::TYPES_DATA);
+=======
         GenerateController::create($aDatabase->tabelas);
+        GenerateView::create($aDatabase->tabelas);
+>>>>>>> Stashed changes
         GenerateModel::create($aDatabase->tabelas, self::TYPES_DATA);
         GenerateCore::create();
         GenerateIndex::create();

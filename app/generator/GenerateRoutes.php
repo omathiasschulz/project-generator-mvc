@@ -11,7 +11,10 @@ class GenerateRoutes
      */
     public static function create($aTabelas)
     {
-        $routes = "<?php\n";
+        $routes = "<?php\n"
+            . "\n// Rota da página principal"
+            . "\n\$route[] = ['/', 'HomeController@index'];\n"
+        ;
         foreach ($aTabelas as $oTabela) {
             $routes .= self::defaultRoutes($oTabela->nome);
         }
@@ -34,7 +37,7 @@ class GenerateRoutes
             . "\n// Rota que leva a tela de alteração de um registro "
             . "\n\$route[] = ['/" . $routeName . "/{id}/atualizar', '" . ucfirst($routeName) . "Controller@atualizar'];"
             . "\n// Rota que recebe o request com o registro e altera no banco "
-            . "\n\$route[] = ['/" . $routeName . "/alterar', '" . ucfirst($routeName) . "Controller@atualizar'];"
+            . "\n\$route[] = ['/" . $routeName . "/alterar', '" . ucfirst($routeName) . "Controller@alterar'];"
             . "\n// Rota que leva a tela de visualização de um registro "
             . "\n\$route[] = ['/" . $routeName . "/{id}/visualizar', '" . ucfirst($routeName) . "Controller@visualizar'];"
             . "\n// Rota que leva a tela de visualização com todos os registros "
