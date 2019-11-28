@@ -11,6 +11,6 @@ create table produto (
     peso float,
     pesoEmbalado float,
     dataFabricacao datetime not null,
-    dataCompra year,
+    dataCompra datetime,
     primary key(codigo)
 );
