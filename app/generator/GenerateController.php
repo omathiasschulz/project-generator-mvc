@@ -119,14 +119,14 @@ class GenerateController
         
         $oBody = new StringBuilder();
         $oBody->appendNL("if (!isset(\$request) || !isset(\$request->post)) { ")
-            ->appendNL("Redirecionador::paraARota('cadastrar?cadastrado=0'); ")
+            ->appendNL("Redirecionador::paraARota('/" . $sName . "/cadastrar?cadastrado=0'); ")
             ->appendNL("return; ")
             ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
             ->appendNL("\$" . $sName . " = (new " . ucfirst($sName) . "())")
             ->appendNL($oFieldsSet . ";")
             ->appendNL("\$result = \$" . $sName . "BO->inserir(\$" . $sName . ");")
-            ->append("Redirecionador::paraARota('cadastrar?cadastrado=' . \$result);")
+            ->append("Redirecionador::paraARota('/" . $sName . "/cadastrar?cadastrado=' . \$result);")
         ;
 
         return Helpers::createMethod("inserir", "\$request", $oBody);
@@ -140,6 +140,10 @@ class GenerateController
     {
         $oBody = new StringBuilder();
         $oBody
+            ->appendNL("if (!isset(\$id) || is_null(\$id)) { ")
+            ->appendNL("Redirecionador::paraARota('/" . $sName . "/listar'); ")
+            ->appendNL("return; ")
+            ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
             ->appendNL("\$" . $sName . " = new " . ucfirst($sName) . "();")
             ->appendNL("\$" . $sName . "->set" . ucfirst($aPrimaryKeys[0]) . "(\$id);")
@@ -171,14 +175,14 @@ class GenerateController
         
         $oBody = new StringBuilder();
         $oBody->appendNL("if (!isset(\$request) || !isset(\$request->post)) { ")
-            ->appendNL("Redirecionador::paraARota('alterar?alterado=0'); ")
+            ->appendNL("Redirecionador::paraARota('/" . $sName . "/listar?alterado=0'); ")
             ->appendNL("return; ")
             ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
             ->appendNL("\$" . $sName . " = (new " . ucfirst($sName) . "())")
             ->appendNL($oFieldsSet . ";")
             ->appendNL("\$result = \$" . $sName . "BO->atualizar(\$" . $sName . ");")
-            ->append("Redirecionador::paraARota('listar?alterado=' . \$result);")
+            ->append("Redirecionador::paraARota('/" . $sName . "/listar?alterado=' . \$result);")
             ;
         
         return Helpers::createMethod("alterar", "\$request", $oBody);
@@ -192,18 +196,18 @@ class GenerateController
     {
         $oBody = new StringBuilder();
         $oBody
-            // ->appendNL("if (!isset(\$id) || !is_null(\$id)) { ")
-            // ->appendNL("Redirecionador::paraARota('listar'); ")
-            // ->appendNL("return; ")
-            // ->appendNL("} ")
+            ->appendNL("if (!isset(\$id) || is_null(\$id)) { ")
+            ->appendNL("Redirecionador::paraARota('/" . $sName . "/listar'); ")
+            ->appendNL("return; ")
+            ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
             ->appendNL("\$" . $sName . " = new " . ucfirst($sName) . "();")
             ->appendNL("\$" . $sName . "->set" . ucfirst($aPrimaryKeys[0]) . "(\$id);")
             ->appendNL("\$" . $sName . " = \$" . $sName . "BO->buscarUm(\$" . $sName . ");")
-            // ->appendNL("if (empty(\$" . $sName . ")) {")
-            // ->appendNL("Redirecionador::paraARota('listar');")
-            // ->appendNL("return; ")
-            // ->appendNL("}")
+            ->appendNL("if (empty(\$" . $sName . ")) {")
+            ->appendNL("Redirecionador::paraARota('/" . $sName . "/listar');")
+            ->appendNL("return; ")
+            ->appendNL("}")
             ->appendNL("\$this->view->" . $sName . " = \$" . $sName . ";")
             ->append("\$this->requisitarView('" . $sName . "/visualizar', 'baseHtml');")
             ;
@@ -232,17 +236,20 @@ class GenerateController
     private function defaultMethodDeletar($sName, $aPrimaryKeys)
     {
         $oBody = new StringBuilder();
-        $oBody
+        $oBody->appendNL("if (!isset(\$id) || is_null(\$id)) { ")
+            ->appendNL("Redirecionador::paraARota('/" . $sName . "/listar?deletado=0'); ")
+            ->appendNL("return; ")
+            ->appendNL("} ")
             ->appendNL("\$" . $sName . "BO  = new " . ucfirst($sName) . "BO((new " . ucfirst($sName) . "DAO()));")
             ->appendNL("\$" . $sName . " = new " . ucfirst($sName) . "();")
             ->appendNL("\$" . $sName . "->set" . ucfirst($aPrimaryKeys[0]) . "(\$id);")
             ->appendNL("\$" . $sName . " = \$" . $sName . "BO->buscarUm(\$" . $sName . ");")
             ->appendNL("if (empty(\$" . $sName . ")) {")
-            ->appendNL("self::listar();")
+            ->append("Redirecionador::paraARota('/" . $sName . "/listar?deletado=0');")
             ->appendNL("return; ")
             ->appendNL("}")
             ->appendNL("\$" . $sName . " = \$" . $sName . "BO->deletar(\$" . $sName . ");")
-            ->append("self::listar();")
+            ->append("Redirecionador::paraARota('/" . $sName . "/listar?deletado=1');")
             ;
         
         return Helpers::createMethod("deletar", "\$id", $oBody);
