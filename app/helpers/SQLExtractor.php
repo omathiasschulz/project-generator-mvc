@@ -7,7 +7,7 @@ class SQLExtractor
     // Regex que pega tudo até o primeiro ponto e vírgula
     const PATTERN_TO_THE_SEMICOLON = "/(?i)\A([^;]+)\;/";
 
-    const TYPES_NORMAL = ['decimal', 'tinyint', 'int', 'bigint', 'float', 'double', 'date', 'time', 'datetime', 'year'];
+    const TYPES_NORMAL = ['decimal', 'tinyint', 'int', 'bigint', 'float', 'double', 'date', 'datetime'];
     const TYPES_WITH_CONFIG_ONE = ['varchar', 'decimal'];
     const TYPES_WITH_CONFIG_TWO = ['decimal'];
 
@@ -117,19 +117,20 @@ class SQLExtractor
     private function getTableAttributes($sAttributes, $sTypes)
     {
         // Remove os parênteses iniciais e finais
-        $sAttributes = substr(trim($sAttributes), 1, strlen($sAttributes) - 2);
+        $sAttributes = substr(trim($sAttributes), 1, strlen(trim($sAttributes)) - 2);
 
         // Verifica as chaves primárias e já retira dos parâmetros também
         $aPrimaryKeys = self::getTablePrimaryKey($sAttributes);
         if (!$aPrimaryKeys[0])
             return $aPrimaryKeys;
         $aFormattedAttributes[] = ['chaves_primarias' => $aPrimaryKeys[1]];
-        $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)[[:space:]]*$/";
-        $sAttributes = preg_split($sPattern, $sAttributes)[0];
-
+        
         // Realiza um split na vírgula 
         // Entretanto não pode dar split na virgula de atributos como decimal(3,3)
         $aAttributes = preg_split("/(?<=[^0-9])\,/", $sAttributes);
+
+        // Remove a última posição que representa a chave primária
+        array_pop($aAttributes);
         
         foreach ($aAttributes as $sAttribute) {
             $aActualAttribute = self::getTableOneAttribute($sAttribute, $sTypes);
@@ -146,7 +147,7 @@ class SQLExtractor
     private function getTablePrimaryKey($sAttribute)
     {
         $sAttribute = trim($sAttribute);
-        $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key\(([a-zA-Z0-9\_\-\,[:space:]]+)\)$/";
+        $sPattern = "/(?i)\,[[:space:]]*primary[[:space:]]+key[[:space:]]*\([[:space:]]*([a-zA-Z0-9_-]+)[[:space:]]*\)$/";
         preg_match_all($sPattern, $sAttribute, $aMatches);
 
         if (!isset($aMatches[1][0])) {

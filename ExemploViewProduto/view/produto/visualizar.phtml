@@ -41,13 +41,13 @@
 <div class="form-row">
     <div class="form-group col-md-12">
         <label for="dataFabricacao">dataFabricacao</label>
-        <input type="date" class="form-control" value="<?= $this->view->produto->getDataFabricacao()->format('Y-m-d') ?>" id="dataFabricacao" name="dataFabricacao" placeholder="dataFabricacao" readonly>
+        <input type="date" class="form-control" value="<?= ($this->view->produto->getDataFabricacao() != "") ? $this->view->produto->getDataFabricacao()->format('Y-m-d') : "" ?>" id="dataFabricacao" name="dataFabricacao" placeholder="dataFabricacao" readonly>
     </div>
 </div>
 <div class="form-row">
     <div class="form-group col-md-12">
         <label for="dataCompra">dataCompra</label>
-        <input type="date" class="form-control" value="<?= $this->view->produto->getDataCompra()->format('Y-m-d') ?>" id="dataCompra" name="dataCompra" placeholder="dataCompra" readonly>
+        <input type="date" class="form-control" value="<?= ($this->view->produto->getDataCompra() != "") ? $this->view->produto->getDataCompra()->format('Y-m-d') : "" ?>" id="dataCompra" name="dataCompra" placeholder="dataCompra" readonly>
     </div>
 </div>
 

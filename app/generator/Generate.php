@@ -21,15 +21,15 @@ class Generate
             return $aSQL;
         $aDatabase = $aSQL[1];
 
-        //GenerateRoutes::create($aDatabase->tabelas);
-        //GenerateConexao::create($aDatabase->nome);
-        //GenerateController::create($aDatabase->tabelas, self::TYPES_DATA);
+        GenerateRoutes::create($aDatabase->tabelas);
+        GenerateConexao::create($aDatabase->nome);
+        GenerateController::create($aDatabase->tabelas, self::TYPES_DATA);
         GenerateView::create($aDatabase->tabelas);
-        //GenerateModel::create($aDatabase->tabelas, self::TYPES_DATA);
-        //GenerateCore::create();
-        //GenerateIndex::create();
-        //GenerateHtAccess::create();
-        //GenerateComposer::create();
+        GenerateModel::create($aDatabase->tabelas, self::TYPES_DATA);
+        GenerateCore::create();
+        GenerateIndex::create();
+        GenerateHtAccess::create();
+        GenerateComposer::create();
 
         return [true, "Projeto gerado com sucesso! \n"];
     }

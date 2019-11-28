@@ -108,7 +108,7 @@ class GenerateController
                 // Validação especial para o tipo data
                 if (in_array($oAttribute->tipo, $aTypesData)) {
                     $oFieldsSet->appendNL(
-                        "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? new Datetime(\$request->post->" . $oAttribute->nome . ") : '')"
+                        "\t->set" . ucfirst($oAttribute->nome) . "((isset(\$request->post->" . $oAttribute->nome . ") && \$request->post->" . $oAttribute->nome . " != \"\") ? new Datetime(\$request->post->" . $oAttribute->nome . ") : '')"
                     );
                 } else {
                     $oFieldsSet->appendNL(
@@ -165,7 +165,7 @@ class GenerateController
             // Validação especial para o tipo data
             if (in_array($oAttribute->tipo, $aTypesData)) {
                 $oFieldsSet->appendNL(
-                    "\t->set" . ucfirst($oAttribute->nome) . "(isset(\$request->post->" . $oAttribute->nome . ") ? new Datetime(\$request->post->" . $oAttribute->nome . ") : '')"
+                    "\t->set" . ucfirst($oAttribute->nome) . "((isset(\$request->post->" . $oAttribute->nome . ") && \$request->post->" . $oAttribute->nome . " != \"\") ? new Datetime(\$request->post->" . $oAttribute->nome . ") : '')"
                 );
             } else {
                 $oFieldsSet->appendNL(
