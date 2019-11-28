@@ -13,7 +13,7 @@ class GenerateView
     public function create($aTables)
     {   
         Helpers::createFolder('app/view');
-        Helpers::writeFile('app/view/baseHtml.phtml', file_get_contents(__DIR__ . '../defaultViews/baseHtml.phtml'));
+        Helpers::writeFile('app/view/baseHtml.phtml', file_get_contents(__DIR__ . '/defaultViews/baseHtml.phtml'));
         Helpers::writeFile('app/view/footer.phtml', '');
         Helpers::writeFile('app/view/index.phtml', '');
         Helpers::writeFile('app/view/header.phtml', self::content($aTables));
