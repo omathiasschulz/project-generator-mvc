@@ -117,7 +117,7 @@ class SQLExtractor
     private function getTableAttributes($sAttributes, $sTypes)
     {
         // Remove os parênteses iniciais e finais
-        $sAttributes = substr(trim($sAttributes), 1, strlen($sAttributes) - 2);
+        $sAttributes = substr(trim($sAttributes), 1, strlen(trim($sAttributes)) - 2);
 
         // Verifica as chaves primárias e já retira dos parâmetros também
         $aPrimaryKeys = self::getTablePrimaryKey($sAttributes);
