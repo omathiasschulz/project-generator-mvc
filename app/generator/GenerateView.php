@@ -10,7 +10,7 @@ class GenerateView
     /**
      * Método responsável por gerar as view
      */
-    public function create($aTables)
+public function create($aTables)
     {   
         Helpers::createFolder('app/view');
         Helpers::writeFile('app/view/baseHtml.phtml', file_get_contents(__DIR__ . '/defaultViews/baseHtml.phtml'));
@@ -101,21 +101,25 @@ private function att($table, $nome){
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="'.$table[$i]->nome.'">'.$table[$i]->nome.'</label>
-                <input type="'.self::tipoCampo($table[$i]->tipo).'" value="<?= $this->view->'.$nome.'->get'.ucfirst($table[$i]->nome).'() ?>" class="form-control" id="'.$table[$i]->nome.'" name="'.$table[$i]->nome.'" placeholder="'.$table[$i]->nome.'" '.self::verificaCampos($i, $table[$i]->not_null).'>
+                <input type="'.self::tipoCampo($table[$i]->tipo).'" value="<?= $this->view->'.$nome.'->'.self::validaGet($table[$i]).'?>" class="form-control" id="'.$table[$i]->nome.'" name="'.$table[$i]->nome.'" placeholder="'.$table[$i]->nome.'" '.self::verificaCampos($i, $table[$i]->not_null).'>
             </div>
         </div>');
             
     }
+    
     $string = '<div class="container">
     <br><h1>Alterar '.ucfirst($nome).'</h1><br>
 
-    <form action="/'.$nome.'/alterar" method="POST">'.$campos;
+    <form action="/'.$nome.'/alterar" method="POST">'.$campos.'
+    <button type="submit" class="btn btn-sm btn-primary float-right"><i class="fa fa-plus-circle"></i>Salvar</button>
+    </form>
 
+    </div><br><br><br><br>';
     return $string;
 }
 private function cad($table, $nome){
     $campos = new StringBuilder();
-
+    
     for ($i=1; $i < count($table); $i++) { 
         $campos->append('    
         <div class="form-row">
@@ -140,11 +144,11 @@ private function cad($table, $nome){
 private function list($table, $nome, $pk){
     $campos = new StringBuilder();
     $th = new StringBuilder();
-
-    if (count($table) > 5) {
-        for ($i=1; $i < 6; $i++) { 
+    
+    if (count($table) > 4) {
+        for ($i=0; $i < 5; $i++) { 
             $th->append("\n\t\t\t".'<th>'.ucfirst($table[$i]->nome).'</th>');
-            $campos->append('<td onclick="location.href = \'/'.$nome.'/<?php echo $'.$nome.'->get'.ucfirst(ucfirst($table[$i]->nome)).'(); ?>/visualizar.\';"><?php echo $'.$nome.'->get'.ucfirst($table[$i]->nome).'(); ?> </td>
+            $campos->append('<td onclick="location.href = \'/'.$nome.'/<?php echo $'.$nome.'->get'.ucfirst($table[0]->nome).'(); ?>/visualizar\';"><?php echo $'.$nome.'->'.self::validaGet($table[$i]).'?> </td>
             ');
         }
     }
@@ -186,7 +190,7 @@ private function visu($table, $nome){
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="'.$table[$i]->nome.'">'.$table[$i]->nome.'</label>
-                <input type="'.self::tipoCampo($table[$i]->tipo).'" value="<?= $this->view->'.$nome.'->get'.ucfirst($table[$i]->nome).'() ?>" class="form-control" id="'.$table[$i]->nome.'" name="'.$table[$i]->nome.'" placeholder="'.$table[$i]->nome.'" readonly>
+                <input type="text" value="<?= $this->view->'.$nome.'->'.self::validaGet($table[$i]).'?>" class="form-control" id="'.$table[$i]->nome.'" name="'.$table[$i]->nome.'" placeholder="'.$table[$i]->nome.'" readonly>
             </div>
         </div>');
             
@@ -200,7 +204,7 @@ private function visu($table, $nome){
 }
 
 private function verificaCampos($pos, $nulo){
-    if ($pos==1) {
+    if ($pos==0) {
         if ($nulo) {
             return 'readonly required';
         }else{
@@ -221,4 +225,12 @@ private function tipoCampo($tipoVar){
     }
 }
 
+private function validaGet($table){
+    if ($table->tipo == 'datetime' || $table->tipo == 'date') {
+        return 'get'.ucfirst($table->nome).'()->format(\'d-m-Y\');';
+    } else {
+        return 'get'.ucfirst($table->nome).'();';
+    }
+
+}
 }
