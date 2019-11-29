@@ -1,6 +1,6 @@
-CREATE DATABASE LAUNCHES;
+create database launches;
 
-USE LAUNCHES;
+use launches;
 
 create table rocket (
     id int not null auto_increment,
@@ -15,14 +15,18 @@ create table rocket (
     primary key (id)
 );
 
-create table produto (
-    codigo int not null auto_increment,
-    descricao varchar(100) not null,
-    valorBruto decimal(8,3) not null,
-    valorLiquido decimal,
-    peso float,
-    pesoEmbalado float,
-    dataFabricacao datetime not null,
-    dataCompra datetime,
-    primary key(codigo)
+create table mission (
+	id int not null auto_increment,
+    mission_id varchar(50),
+    name varchar(50),
+    description  varchar(100),
+    primary key (id)
+);
+
+create table launch (
+	id int not null auto_increment,
+    flight_number varchar(50),
+    date date,
+    description varchar(100) not null,
+    primary key (id)
 );

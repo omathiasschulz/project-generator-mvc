@@ -146,7 +146,13 @@ private function list($table, $nome, $pk){
     if (count($table) > 4) {
         for ($i=0; $i < 5; $i++) { 
             $th->append("\n\t\t\t".'<th>'.ucfirst($table[$i]->nome).'</th>');
-            $campos->append('<td onclick="location.href = \'/'.$nome.'/<?php echo $'.$nome.'->get'.ucfirst($table[0]->nome).'(); ?>/visualizar\';"><?php echo $'.$nome.'->'.self::validaGetVisualizar($table[$i]).'?> </td>
+            $campos->append('<td onclick="location.href = \'/'.$nome.'/<?php echo $'.$nome.'->get'.ucfirst($table[0]->nome).'(); ?>/visualizar\';"><?php echo '.self::validaGetVisualizar($nome, $table[$i]).'?> </td>
+            ');
+        }
+    } else {
+        for ($i=0; $i < count($table); $i++) { 
+            $th->append("\n\t\t\t".'<th>'.ucfirst($table[$i]->nome).'</th>');
+            $campos->append('<td onclick="location.href = \'/'.$nome.'/<?php echo $'.$nome.'->get'.ucfirst($table[0]->nome).'(); ?>/visualizar\';"><?php echo '.self::validaGetVisualizar($nome, $table[$i]).'?> </td>
             ');
         }
     }
@@ -231,11 +237,15 @@ private function validaGet($nome, $table){
     }
 
 }
-private function validaGetVisualizar($table){
+private function validaGetVisualizar($nome, $table){
     if ($table->tipo == 'datetime' || $table->tipo == 'date') {
-        return 'get'.ucfirst($table->nome).'()->format(\'d-m-Y\')';
+        // return 'get'.ucfirst($table->nome).'()->format(\'d-m-Y\')';
+        // $a = '$'.$nome.'->'.self::validaGetVisualizar($table[$i]).'
+
+        // return '()';
+        return '(($'.$nome.'->get'.ucfirst($table->nome).'() != "") ? $'.$nome.'->get'.ucfirst($table->nome).'()->format("Y-m-d") : "")';
     } else {
-        return 'get'.ucfirst($table->nome).'()';
+        return '$'.$nome.'->get'.ucfirst($table->nome).'()';
     }
 
 }
