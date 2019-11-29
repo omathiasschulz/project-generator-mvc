@@ -1,5 +1,7 @@
 # ProjectGenerator
 
+Gerador de CRUD (Create, Read, Update and Delete) em PHP utilizando composer e sistema de rotas amigáveis
+
 ### Gerando o projeto
 
 Iniciando a geração do projeto
