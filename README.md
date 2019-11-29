@@ -1,13 +1,13 @@
 # ProjectGenerator
 
-Gerador de CRUD (Create, Read, Update and Delete) utilizando o padrão de projeto MVC (Model, View e Controller) em PHP utilizando composer e sistema de rotas amigáveis
+Gerador de CRUD (Create, Read, Update and Delete) utilizando o padrão de projeto MVC (Model, View e Controller) em PHP, utilizando composer e sistema de rotas amigáveis
 
 
 ### Gerando o projeto
 
 Iniciando a geração do projeto
 
-Insira o SQL do projeto a ser gerado no arquivo sql.sql
+Insira o SQL do projeto a ser gerado no arquivo 'sql.sql'
 
 Exemplo de um SQL permitido:
 
@@ -54,16 +54,16 @@ php start.php
 
 Após executar o comando, será criado uma pasta Project, com o projeto gerado com CRUD, no padrão de projeto MVC, com conexão com o banco e rotas amigáveis
 
-Para funcionar corretamente você deve possuir o Composer instalado e o PHP na versão 7.3.11-1
+Para funcionar corretamente você deve possuir o Composer instalado e o PHP na versão 7.3.11
 
 
 ### Atualizando a configuração do XAMPP
 
 Para o projeto a ser gerado funcionar com sucesso é necessário alterar as configurações no XAMPP, para que as rotas amigáveis funcionem corretamente
 
-No Linux: Abra a GUI do XAMPP, clique no botão Config do apache e, em seguida, abra o arquivo 'httpd.conf'.
+No Windows: Abra a GUI do XAMPP, clique no botão Config do apache e, em seguida, abra o arquivo 'httpd.conf'.
 
-No Windows: Abra a GUI do XAMPP, clique no apache e, em seguida, abra as configurações. Será aberto um pequeno modal, clique em 'Open Conf File'
+No Linux: Abra a GUI do XAMPP, clique no apache e, em seguida, abra as configurações. Será aberto um pequeno modal, clique em 'Open Conf File'
 
 Vá até a configuração de Document Root, como apresentado abaixo:
 
@@ -86,7 +86,7 @@ DocumentRoot "/opt/lampp/htdocs/ProjectGenerator/Project"
 
 Após a alteração, se acessar o localhost no navegador, abrirá a página principal do projeto gerador
 
-Exemplo de rota amigável:
+Exemplos de rotas amigáveis:
 
 ```
 // Rota da página principal
