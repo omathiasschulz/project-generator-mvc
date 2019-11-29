@@ -101,7 +101,7 @@ private function att($table, $nome){
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="'.$table[$i]->nome.'">'.$table[$i]->nome.'</label>
-                <input type="'.self::tipoCampo($table[$i]->tipo).'" value="<?= $this->view->'.$nome.'->'.self::validaGet($table[$i]).'?>" class="form-control" id="'.$table[$i]->nome.'" name="'.$table[$i]->nome.'" placeholder="'.$table[$i]->nome.'" '.self::verificaCampos($i, $table[$i]->not_null).'>
+                <input type="'.self::tipoCampo($table[$i]->tipo).'" value="'.self::validaGet($nome, $table[$i]).'" class="form-control" id="'.$table[$i]->nome.'" name="'.$table[$i]->nome.'" placeholder="'.$table[$i]->nome.'" '.self::verificaCampos($i, $table[$i]->not_null).'>
             </div>
         </div>');
             
@@ -148,7 +148,7 @@ private function list($table, $nome, $pk){
     if (count($table) > 4) {
         for ($i=0; $i < 5; $i++) { 
             $th->append("\n\t\t\t".'<th>'.ucfirst($table[$i]->nome).'</th>');
-            $campos->append('<td onclick="location.href = \'/'.$nome.'/<?php echo $'.$nome.'->get'.ucfirst($table[0]->nome).'(); ?>/visualizar\';"><?php echo $'.$nome.'->'.self::validaGet($table[$i]).'?> </td>
+            $campos->append('<td onclick="location.href = \'/'.$nome.'/<?php echo $'.$nome.'->get'.ucfirst($table[0]->nome).'(); ?>/visualizar\';"><?php echo $'.$nome.'->'.self::validaGetVisualizar($table[$i]).'?> </td>
             ');
         }
     }
@@ -190,7 +190,7 @@ private function visu($table, $nome){
         <div class="form-row">
             <div class="form-group col-md-12">
                 <label for="'.$table[$i]->nome.'">'.$table[$i]->nome.'</label>
-                <input type="text" value="<?= $this->view->'.$nome.'->'.self::validaGet($table[$i]).'?>" class="form-control" id="'.$table[$i]->nome.'" name="'.$table[$i]->nome.'" placeholder="'.$table[$i]->nome.'" readonly>
+                <input type="text" value="' . self::validaGet($nome, $table[$i]) . '" class="form-control" id="'.$table[$i]->nome.'" name="'.$table[$i]->nome.'" placeholder="'.$table[$i]->nome.'" readonly>
             </div>
         </div>');
             
@@ -225,11 +225,19 @@ private function tipoCampo($tipoVar){
     }
 }
 
-private function validaGet($table){
+private function validaGet($nome, $table){
     if ($table->tipo == 'datetime' || $table->tipo == 'date') {
-        return 'get'.ucfirst($table->nome).'()->format(\'d-m-Y\');';
+        return '<?= ($this->view->'.$nome.'->get'.ucfirst($table->nome).'() != "") ? $this->view->'.$nome.'->get'.ucfirst($table->nome).'()->format("Y-m-d") : "" ?>';
     } else {
-        return 'get'.ucfirst($table->nome).'();';
+        return '<?= $this->view->'.$nome.'->get'.ucfirst($table->nome).'() ?>';
+    }
+
+}
+private function validaGetVisualizar($table){
+    if ($table->tipo == 'datetime' || $table->tipo == 'date') {
+        return 'get'.ucfirst($table->nome).'()->format(\'d-m-Y\')';
+    } else {
+        return 'get'.ucfirst($table->nome).'()';
     }
 
 }
