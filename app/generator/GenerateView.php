@@ -96,7 +96,7 @@ private function content($tables){
 
 private function att($table, $nome){
     $campos = new StringBuilder();
-    for ($i=1; $i < count($table); $i++) { 
+    for ($i=0; $i < count($table); $i++) { 
         $campos->append('    
         <div class="form-row">
             <div class="form-group col-md-12">
