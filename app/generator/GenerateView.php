@@ -19,17 +19,17 @@ public function create($aTables)
         Helpers::writeFile('app/view/header.phtml', self::content($aTables));
         
         
-        foreach ($aTables as $oTable) {
+        foreach ($aTables as $key => $oTable) {
             Helpers::createFolder('app/view/'.$oTable->nome);
             // Remove a primeira posição do array, que são as chaves primárias
             $aAttributes = $oTable->atributos;
             $oPrimaryKeys = array_shift($aAttributes);
             $aPrimaryKeys = $oPrimaryKeys->chaves_primarias;
 
-            Helpers::writeFile('app/view/'.$oTable->nome.'/atualizar.phtml', self::att($aAttributes, $aTables[0]->nome));
-            Helpers::writeFile('app/view/'.$oTable->nome.'/cadastrar.phtml', self::cad($aAttributes, $aTables[0]->nome));
-            Helpers::writeFile('app/view/'.$oTable->nome.'/listar.phtml', self::list($aAttributes, $aTables[0]->nome, $aPrimaryKeys));
-            Helpers::writeFile('app/view/'.$oTable->nome.'/visualizar.phtml', self::visu($aAttributes, $aTables[0]->nome));
+            Helpers::writeFile('app/view/'.$oTable->nome.'/atualizar.phtml', self::att($aAttributes, $aTables[$key]->nome));
+            Helpers::writeFile('app/view/'.$oTable->nome.'/cadastrar.phtml', self::cad($aAttributes, $aTables[$key]->nome));
+            Helpers::writeFile('app/view/'.$oTable->nome.'/listar.phtml', self::list($aAttributes, $aTables[$key]->nome, $aPrimaryKeys));
+            Helpers::writeFile('app/view/'.$oTable->nome.'/visualizar.phtml', self::visu($aAttributes, $aTables[$key]->nome));
 
             
             
@@ -41,18 +41,16 @@ public function create($aTables)
     }
 
 private function content($tables){
-        $cad='';
-        $visu='';
+        $cad='<div class="dropdown-menu" aria-labelledby="navbarDropdown">' . "\n";
+        $visu='<div class="dropdown-menu" aria-labelledby="navbarDropdown">' . "\n";
         for ($i=0; $i < count($tables); $i++) { 
-            $cad ='
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="/'.$tables[$i]->nome.'/cadastrar">'.$tables[$i]->nome.'</a>
-                </div>';
-            $visu='
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="/'.$tables[$i]->nome.'/listar">'.$tables[$i]->nome.'</a>
-            </div>';
+            $cad .='
+                    <a class="dropdown-item" href="/'.$tables[$i]->nome.'/cadastrar">'.$tables[$i]->nome.'</a>';
+            $visu .='
+                <a class="dropdown-item" href="/'.$tables[$i]->nome.'/listar">'.$tables[$i]->nome.'</a>';
         }
+        $cad .= '</div>';
+        $visu .= '</div>';
         $string = '<!DOCTYPE html>
 <html>
 <head>
